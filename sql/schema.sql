@@ -24,6 +24,8 @@ CREATE TABLE training_set
     weight          INT         NOT NULL,
     times           INT         NOT NULL,
     workout_date    DATE        NOT NULL,
-    user_id         varchar(10) REFERENCES users (user_id),
+    user_id         INT REFERENCES users (user_id),
     PRIMARY KEY (trainingset_id)
 );
+
+
