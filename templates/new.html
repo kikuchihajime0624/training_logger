@@ -2,9 +2,50 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>New</title>
+    <title>今日の記録をつける</title>
+    <link rel="stylesheet" href="../css/style.css">
 </head>
 <body>
-    <h1>New</h1>
+<h1>New</h1>
+
+<div>
+    <div>
+        <label for="workout_date">日付</label>
+        <input type="date" id="workout_date" name="workout_date"/>
+
+    </div>
+    <div>
+        <label for="workout_name">種目</label>
+        <input type="text" id="workout_name" name="workout_name"/>
+    </div>
+
+    <div>
+        <label for="workout_parts">部位</label>
+        <input type="text" id="workout_parts" name="workout_parts"/>
+    </div>
+    <div>
+        <label for="workout_weight">重量</label>
+        <input type="number" id="workout_weight" name="workout_weight"/>
+        <div>
+            <select id="workout_weight_unit" name="workout_weight_unit">
+                <option value="kg" selected>kg</option>
+                <option value="lb">lb</option>
+            </select>
+        </div>
+    </div>
+    <div>
+        <label for="workout_times">回数</label>
+        <input type="number" id="workout_times" name="workout_times"/>
+    </div>
+</div>
+
+<div>
+    <input type="submit" value="追加"/>
+</div>
+
+
+<div>
+
+</div>
 </body>
 </html>
