@@ -37,6 +37,16 @@ async fn new(pool: web::Data<PgPool>, form: web::Form<ItemRequest>) -> HttpRespo
     HttpResponse::Found().append_header(("Location", "/")).finish()
 }
 
+#[get("/detail")]
+async fn detail(pool: web::Data<Postgres>) -> HttpResponse {
+
+}
+
+#[post("/detail/edit")]
+async fn edit_detail(pool: web::Data<Postgres>) -> HttpResponse {
+
+}
+
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     let pool = PgPool::connect("postgres::memory:").await.unwrap();
@@ -45,6 +55,9 @@ async fn main() -> std::io::Result<()> {
         templates.autoescape_on(vec!["tera"]);
         App::new()
             .service(dates)
+            .service(new)
+            .service(detail)
+            .service(edit)
             .app_data(web::Data::new(pool.clone()))
     })
     .bind(("127.0.0.1", 8080))?
