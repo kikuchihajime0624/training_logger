@@ -1,3 +1,4 @@
-INSERT INTO training_event (event_id, event_name) VALUES ("1", armcarl );
+INSERT INTO training_event (event_name) VALUES (exsample_event);
 
-INSERT INTO
+INSERT INTO training_parts (parts_name) VALUES (exsample_parts);
+
