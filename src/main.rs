@@ -42,13 +42,13 @@ struct WorkoutSet {
 
 #[get("/")]
 async fn dates(tera: web::Data<Tera>, pool: web::Data<PgPool>) -> HttpResponse {
-    let rows = sqlx::query_as::<_, WorkoutSet>("SELECT workout_date FROM training_set")
+    let rows = sqlx::query_as::<_, WorkoutSet>("SELECT * FROM training_set")
         .fetch_all(pool.as_ref())
         .await
         .unwrap();
 
     let mut context = Context::new();
-    context.insert("date_list", &rows);
+    context.insert("workout_list", &rows);
 
     let rendered = tera.render("training_logger.tera", &context).unwrap();
     HttpResponse::Ok().content_type("text/html").body(rendered)
