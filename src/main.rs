@@ -1,11 +1,10 @@
 use actix_web::{get, web, App, HttpResponse, HttpServer};
-use askama::Template;
 use dotenvy::dotenv;
 use sqlx::{FromRow, PgPool};
 use std::env;
 use chrono::NaiveDate;
 use tera::{Context, Tera};
-use serde::{Serialize};
+use serde::{Deserialize, Serialize};
 
 // #[derive(Template)]
 // struct Workouts {
@@ -16,17 +15,34 @@ use serde::{Serialize};
 //     times: i32,
 // }
 
-#[derive(Debug, FromRow, Serialize)]
-struct Item {
-    id: i32,
-    name: String,
-    price: i32,
-    release_date: Option<NaiveDate>,
-    description: Option<String>, // NULLが入るかもしれない時はOptionにする
+#[derive(Debug, Deserialize)]
+struct WorkoutForm {
+    //ユーザーがデータベースに入力する値
+    event_name: String,
+    parts_name: String,
+    weight: i32,
+    times: i32,
+    workout_date: Option<NaiveDate>, // NULLが入るかもしれない時はOptionにする
 }
+
+
+#[derive(Debug, FromRow, Serialize)]
+struct WorkoutSet {
+    //HTMLがデータベースから受け取る値
+    training_set_id: i32,
+    event_id: i32,
+    parts_id: i32,
+    weight: i32,
+    times: i32,
+    workout_date: Option<NaiveDate>,
+  // NULLが入るかもしれない時はOptionにする
+}
+
+
+
 #[get("/")]
 async fn dates(tera: web::Data<Tera>, pool: web::Data<PgPool>) -> HttpResponse {
-    let rows = sqlx::query_as::<_, Item>("SELECT workout_date FROM training_set")
+    let rows = sqlx::query_as::<_, WorkoutSet>("SELECT workout_date FROM training_set")
         .fetch_all(pool.as_ref())
         .await
         .unwrap();

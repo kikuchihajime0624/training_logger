@@ -5,11 +5,10 @@ edition = "2021"
 
 [dependencies]
 actix-web = "4"
-sqlx = {version =  "0.8.0", features = ["postgres", "runtime-tokio"]}
-askama = "0.12"
-askama_actix = "0.14"
+sqlx = {version =  "0.8.0", features = ["postgres", "runtime-tokio", "chrono"]}
+
 tera = "1.20.0"
-chrono = "0.4.39"
+chrono = { version = "0.4.39", features = ["serde"] }
 watch = "0.2.3"
 dotenvy = "0.15.7"
-serde = "1.0.217"
+serde = { version = "1.0.217"}

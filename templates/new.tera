@@ -5,7 +5,7 @@
 <body>
 <h1>今日の記録をつける</h1>
 
-
+<form action="/update" method="post">
 <div>
     <div>
         <label for="workout_date">日付</label>
@@ -41,9 +41,6 @@
     <input type="submit" value="追加"/>
 </div>
 
-
-<div>
-
-</div>
+</form>
 </body>
 </html>
