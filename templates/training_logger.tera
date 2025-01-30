@@ -17,10 +17,11 @@
         <div>
             <ul>
 
-                {% for date in dates %}
+                {% for date in date_list %}
                 <li>
                     <a href="/detail/{{ workout_date }}">{{ workout_date }}</a>
                 </li>
+                {% endfor %}
 
             </ul>
         </div>
