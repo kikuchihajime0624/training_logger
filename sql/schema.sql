@@ -1,13 +1,16 @@
+DROP TABLE IF EXISTS training_set;
+DROP TABLE IF EXISTS training_parts, training_event, users;
+
 CREATE TABLE training_event
 (
-    event_id   varchar(10) PRIMARY KEY,
-    event_name varchar(10) NOT NULL
+    event_id   SERIAL PRIMARY KEY,
+    event_name varchar(20) NOT NULL
 );
 
 CREATE TABLE training_parts
 (
-    parts_id   varchar(10) PRIMARY KEY,
-    parts_name varchar(10) NOT NULL
+    parts_id   SERIAL PRIMARY KEY,
+    parts_name varchar(20) NOT NULL
 );
 
 CREATE TABLE users
@@ -19,8 +22,8 @@ CREATE TABLE users
 CREATE TABLE training_set
 (
     training_set_id varchar(10) NOT NULL,
-    event_id        varchar(10) REFERENCES training_event (event_id),
-    parts_id        varchar(10) REFERENCES training_parts (parts_id),
+    event_id        SERIAL REFERENCES training_event (event_id),
+    parts_id        SERIAL REFERENCES training_parts (parts_id),
     weight          INT         NOT NULL,
     times           INT         NOT NULL,
     workout_date    DATE        NOT NULL,
