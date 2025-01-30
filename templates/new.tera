@@ -1,12 +1,9 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <title>今日の記録をつける</title>
+{% extends "base.tera" %}
+    <title>{% block title %} {% endblock %} |今日の記録をつける</title>
     <link rel="stylesheet" href="../css/style.css">
-</head>
+
 <body>
-<h1>New</h1>
+<h1>今日の記録をつける</h1>
 
 <div>
     <div>

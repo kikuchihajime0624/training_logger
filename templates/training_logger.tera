@@ -1,42 +1,32 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="utf-8">
-    <title>Training Logger</title>
-    <link rel = "stylesheet" href="../css/style.css">
-</head>
-
-<body>
-<form action="/update" method="post">
+{% extends "base.tera" %}
 
 
-    <div>
-        <a href="new.tera">今日の記録をつける</a>
+    {% block title %} Training Logger {% endblock %}
+<link rel="stylesheet" href="../css/style.css">
 
-    </div>
+{% block content %}
 
-    <div>
-        <ul>
-{#            {% for date in dates %}#}
-{#            <li>#}
-{#                {{date}}#}
-{#                <a href="/detail/{{date}}">{{date}}</a>#}
+    <form action="/update" method="post">
 
 
-{#            </li>#}
-{#            {% endfor %}#}
-{#            <li>#}
-{#                <a href="details/detail.tera">2025/1/27</a>#}
-{#            </li>#}
+        <div>
+            <a href="new.tera">今日の記録をつける</a>
 
-        </ul>
-    </div>
+        </div>
+
+        <div>
+            <ul>
+
+                {% for date in dates %}
+                <li>
+                    <a href="/detail/{{ workout_date }}">{{ workout_date }}</a>
+                </li>
+
+            </ul>
+        </div>
 
 
+    </form>
 
 
-
-</form>
-
-</body>
-</html>
+{% endblock %}
