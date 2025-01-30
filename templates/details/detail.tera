@@ -1,10 +1,10 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <title>Detail</title>
-    <link rel = "stylesheet" href="../../css/style.css">
-</head>
+{% extends "base.tera" %}
+
+    {% block title %}
+        Detail | {{ trainig_set.workout_date }}
+    {% endblock %}
+
+
 <body>
 <h1>Detail</h1>
 
@@ -14,17 +14,20 @@
 </div>
 
 
+{% block contents %}
 <div>
-    <ul>
-        <li>
-            <a>種目1</a>
-        </li>
+    <dt>種目</dt>
+    <dd>{{ training_event.event_name }}</dd>
 
-        <li>
-            <a>種目2</a>
-        </li>
+    <dt>部位</dt>
+    <dd>{{ training_parts.parts.name}} </dd>
 
-    </ul>
+    <dt>重量</dt>
+    <dd>{{ taraining_set.weight}} </dd>
+
+    <dt>回数</dt>
+    <dd>{{ training_set.times}} </dd>
 </div>
+
+{% endblock %}
 </body>
-</html>
