@@ -1,9 +1,11 @@
-use actix_web::{get, post, web, App, HttpResponse, HttpServer};
+use actix_web::{get, web, App, HttpResponse, HttpServer};
 use askama::Template;
-use askama_actix::TemplateToResponse;
-use chrono::{DateTime, Local};
-use sqlx::{PgPool, Postgres};
+use dotenvy::dotenv;
+use sqlx::{FromRow, PgPool};
+use std::env;
+use chrono::NaiveDate;
 use tera::{Context, Tera};
+use serde::{Serialize};
 
 // #[derive(Template)]
 // struct Workouts {
@@ -13,12 +15,25 @@ use tera::{Context, Tera};
 //     weight: i32,
 //     times: i32,
 // }
+
+#[derive(Debug, FromRow, Serialize)]
+struct Item {
+    id: i32,
+    name: String,
+    price: i32,
+    release_date: Option<NaiveDate>,
+    description: Option<String>, // NULLが入るかもしれない時はOptionにする
+}
 #[get("/")]
-async fn dates(tera: web::Data<Tera>) -> HttpResponse {
-    // let dates = Workouts {};
-    // dates.to_response()
+async fn dates(tera: web::Data<Tera>, pool: web::Data<PgPool>) -> HttpResponse {
+    let rows = sqlx::query_as::<_, Item>("SELECT workout_date FROM training_set")
+        .fetch_all(pool.as_ref())
+        .await
+        .unwrap();
 
     let mut context = Context::new();
+    context.insert("date_list", &rows);
+
     let rendered = tera.render("training_logger.tera", &context).unwrap();
     HttpResponse::Ok().content_type("text/html").body(rendered)
 }
@@ -53,18 +68,30 @@ async fn dates(tera: web::Data<Tera>) -> HttpResponse {
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    // let pool = PgPool::connect("postgres::memory:").await.unwrap();
+    dotenv().ok();
+
+    let database_url = env::var("DATABASE_URL").expect("環境変数にDATABASE_URLがありません");
+    let pool = PgPool::connect(&database_url)
+        .await
+        .expect("コネクションプール作成エラー");
+
+    let port_string = env::var("PORT").expect("環境変数にPORTがありません");
+    let port = port_string.parse::<u16>().expect("環境変数にPORTの形式が不正です");
+
+
+
     HttpServer::new(move || {
         let mut templates = Tera::new("templates/**/*").expect("error in tera/templates");
         templates.autoescape_on(vec!["tera"]);
-        App::new().service(dates)
-        // .service(new)
-        // .service(detail)
-        // .service(edit)
+        App::new()
+            .service(dates)
+            // .service(new)
+            // .service(detail)
+            // .service(edit)
             .app_data(web::Data::new(templates))
-        // .app_data(web::Data::new(pool.clone()))
+            .app_data(web::Data::new(pool.clone()))
     })
-    .bind(("127.0.0.1", 8080))?
+    .bind(("0.0.0.0", port))?
     .run()
     .await
 }

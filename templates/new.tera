@@ -5,6 +5,7 @@
 <body>
 <h1>今日の記録をつける</h1>
 
+
 <div>
     <div>
         <label for="workout_date">日付</label>
