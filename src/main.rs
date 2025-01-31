@@ -39,7 +39,7 @@ struct WorkoutSet {
 
 #[get("/")]
 async fn dates(tera: web::Data<Tera>, pool: web::Data<PgPool>) -> HttpResponse {
-    let rows = sqlx::query_as::<_, WorkoutSet>("SELECT * FROM training_set")
+    let rows = sqlx::query_as::<_, WorkoutSet>("SELECT * FROM training_set ORDER BY workout_date DESC")
         .fetch_all(pool.as_ref())
         .await
         .unwrap();
@@ -53,24 +53,20 @@ async fn dates(tera: web::Data<Tera>, pool: web::Data<PgPool>) -> HttpResponse {
 
 #[get("/new")]
 async fn new_log_page(tera: web::Data<Tera>, pool: web::Data<PgPool>) -> HttpResponse {
-
     let mut context = Context::new();
-
 
     let rendered = tera.render("new.tera", &context).unwrap();
     HttpResponse::Ok().content_type("text/html").body(rendered)
 }
 
-
 #[post("/new")]
 async fn new_training_set(pool: web::Data<PgPool>, form: web::Form<WorkoutForm>) -> HttpResponse {
-    println!("fuga");
     let workout_form = form.into_inner();
 
     let new_event_id: i32 = sqlx::query_scalar(
         "
-        INSERT INTO training_event(event_name))
-        VALUES $1
+        INSERT INTO training_event(event_name)
+        VALUES ($1)
 
         RETURNING event_id
         ",
@@ -82,10 +78,10 @@ async fn new_training_set(pool: web::Data<PgPool>, form: web::Form<WorkoutForm>)
 
     let new_parts_id: i32 = sqlx::query_scalar(
         "
-        INSERT INTO training_event(parts_name))
-        VALUES $1
+        INSERT INTO training_parts(parts_name)
+        VALUES ($1)
 
-        RETURNING event_id
+        RETURNING parts_id
         ",
     )
     .bind(workout_form.parts_name)
@@ -94,8 +90,8 @@ async fn new_training_set(pool: web::Data<PgPool>, form: web::Form<WorkoutForm>)
     .unwrap();
 
     sqlx::query(
-        "INSERT INTO training_set(date, event_id, parts_id,  weight, times)
-        VALUES ($1, $2, $3 )",
+        "INSERT INTO training_set(workout_date, event_id, parts_id,  weight, times)
+        VALUES ($1, $2, $3, $4, $5 )",
     )
     .bind(workout_form.workout_date)
     .bind(new_event_id)
