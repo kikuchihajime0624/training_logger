@@ -1,10 +1,10 @@
-use actix_web::{get, web, App, HttpResponse, HttpServer};
+use actix_web::{get, post, web, App, HttpResponse, HttpServer};
+use chrono::NaiveDate;
 use dotenvy::dotenv;
+use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, PgPool};
 use std::env;
-use chrono::NaiveDate;
 use tera::{Context, Tera};
-use serde::{Deserialize, Serialize};
 
 // #[derive(Template)]
 // struct Workouts {
@@ -25,7 +25,6 @@ struct WorkoutForm {
     workout_date: Option<NaiveDate>, // NULLが入るかもしれない時はOptionにする
 }
 
-
 #[derive(Debug, FromRow, Serialize)]
 struct WorkoutSet {
     //HTMLがデータベースから受け取る値
@@ -35,10 +34,8 @@ struct WorkoutSet {
     weight: i32,
     times: i32,
     workout_date: Option<NaiveDate>,
-  // NULLが入るかもしれない時はOptionにする
+    // NULLが入るかもしれない時はOptionにする
 }
-
-
 
 #[get("/")]
 async fn dates(tera: web::Data<Tera>, pool: web::Data<PgPool>) -> HttpResponse {
@@ -54,23 +51,65 @@ async fn dates(tera: web::Data<Tera>, pool: web::Data<PgPool>) -> HttpResponse {
     HttpResponse::Ok().content_type("text/html").body(rendered)
 }
 
-// #[post("/new")]
-// async fn new(pool: web::Data<PgPool>, form: web::Form<ItemRequest>) -> HttpResponse {
-//     let item_request = form.into_inner();
-//
-//     sqlx::query(
-//         "INSERT INTO item (date, event_name, training_parts, weight, times)
-//         VALUES ($1, $2, $3, $4, $5)")
-//         .bind(item_request.date)
-//         .bind(item_request.event_name)
-//         .bind(item_request.training_parts)
-//         .bind(item_request.weight)
-//         .bind(item_request.times)
-//         .await
-//         .unwrap();
-//
-//     HttpResponse::Found().append_header(("Location", "/")).finish()
-// }
+#[get("/new")]
+async fn new_log_page(tera: web::Data<Tera>, pool: web::Data<PgPool>) -> HttpResponse {
+
+    let mut context = Context::new();
+
+
+    let rendered = tera.render("new.tera", &context).unwrap();
+    HttpResponse::Ok().content_type("text/html").body(rendered)
+}
+
+
+#[post("/new")]
+async fn new_training_set(pool: web::Data<PgPool>, form: web::Form<WorkoutForm>) -> HttpResponse {
+    println!("fuga");
+    let workout_form = form.into_inner();
+
+    let new_event_id: i32 = sqlx::query_scalar(
+        "
+        INSERT INTO training_event(event_name))
+        VALUES $1
+
+        RETURNING event_id
+        ",
+    )
+    .bind(workout_form.event_name)
+    .fetch_one(pool.get_ref())
+    .await
+    .unwrap();
+
+    let new_parts_id: i32 = sqlx::query_scalar(
+        "
+        INSERT INTO training_event(parts_name))
+        VALUES $1
+
+        RETURNING event_id
+        ",
+    )
+    .bind(workout_form.parts_name)
+    .fetch_one(pool.get_ref())
+    .await
+    .unwrap();
+
+    sqlx::query(
+        "INSERT INTO training_set(date, event_id, parts_id,  weight, times)
+        VALUES ($1, $2, $3 )",
+    )
+    .bind(workout_form.workout_date)
+    .bind(new_event_id)
+    .bind(new_parts_id)
+    .bind(workout_form.weight)
+    .bind(workout_form.times)
+    .execute(pool.as_ref())
+    .await
+    .unwrap();
+
+    HttpResponse::Found()
+        .append_header(("Location", "/"))
+        .finish()
+}
 
 // #[get("/detail")]
 // async fn detail(pool: web::Data<Postgres>) -> HttpResponse {
@@ -92,15 +131,17 @@ async fn main() -> std::io::Result<()> {
         .expect("コネクションプール作成エラー");
 
     let port_string = env::var("PORT").expect("環境変数にPORTがありません");
-    let port = port_string.parse::<u16>().expect("環境変数にPORTの形式が不正です");
-
-
+    let port = port_string
+        .parse::<u16>()
+        .expect("環境変数にPORTの形式が不正です");
 
     HttpServer::new(move || {
         let mut templates = Tera::new("templates/**/*").expect("error in tera/templates");
         templates.autoescape_on(vec!["tera"]);
         App::new()
             .service(dates)
+            .service(new_training_set)
+            .service(new_log_page)
             // .service(new)
             // .service(detail)
             // .service(edit)
