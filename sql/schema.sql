@@ -15,15 +15,15 @@ CREATE TABLE training_parts
 
 CREATE TABLE users
 (
-    user_id   INT PRIMARY KEY,
-    user_name TEXT NOT NULL
+    user_id   SERIAL PRIMARY KEY,
+    user_name TEXT NOT NULL UNIQUE
 );
 
 CREATE TABLE training_set
 (
     training_set_id SERIAL NOT NULL,
-    event_id        SERIAL REFERENCES training_event (event_id),
-    parts_id        SERIAL REFERENCES training_parts (parts_id),
+    event_id        INT REFERENCES training_event (event_id),
+    parts_id        INT REFERENCES training_parts (parts_id),
     weight          INT         NOT NULL,
     times           INT         NOT NULL,
     workout_date    DATE        NOT NULL,

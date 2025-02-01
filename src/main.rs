@@ -26,7 +26,7 @@ struct WorkoutForm {
 }
 
 #[derive(Debug, FromRow, Serialize)]
-struct WorkoutSet {
+struct TrainingSet {
     //HTMLがデータベースから受け取る値
     training_set_id: i32,
     event_id: i32,
@@ -39,21 +39,22 @@ struct WorkoutSet {
 
 #[get("/")]
 async fn dates(tera: web::Data<Tera>, pool: web::Data<PgPool>) -> HttpResponse {
-    let rows = sqlx::query_as::<_, WorkoutSet>("SELECT * FROM training_set ORDER BY workout_date DESC")
-        .fetch_all(pool.as_ref())
-        .await
-        .unwrap();
+    let rows =
+        sqlx::query_as::<_, TrainingSet>("SELECT * FROM training_set ORDER BY workout_date DESC")
+            .fetch_all(pool.as_ref())
+            .await
+            .unwrap();
 
     let mut context = Context::new();
-    context.insert("workout_list", &rows);
+    context.insert("training_set_list", &rows);
 
     let rendered = tera.render("training_logger.tera", &context).unwrap();
     HttpResponse::Ok().content_type("text/html").body(rendered)
 }
 
 #[get("/new")]
-async fn new_log_page(tera: web::Data<Tera>, pool: web::Data<PgPool>) -> HttpResponse {
-    let mut context = Context::new();
+async fn new_log_page(tera: web::Data<Tera>) -> HttpResponse {
+    let context = Context::new();
 
     let rendered = tera.render("new.tera", &context).unwrap();
     HttpResponse::Ok().content_type("text/html").body(rendered)
@@ -107,15 +108,41 @@ async fn new_training_set(pool: web::Data<PgPool>, form: web::Form<WorkoutForm>)
         .finish()
 }
 
-// #[get("/detail")]
-// async fn detail(pool: web::Data<Postgres>) -> HttpResponse {
-//
-// }
-//
-// #[post("/detail/edit")]
-// async fn edit_detail(pool: web::Data<Postgres>) -> HttpResponse {
-//
-// }
+#[derive(Debug, FromRow, Serialize)]
+struct TrainingSetDetail {
+    //HTMLがデータベースから受け取る値
+    event_name: String,
+    parts_name: String,
+    weight: i32,
+    times: i32,
+}
+
+#[get("/detail/{workout_date}")]
+async fn detail(
+    workout_date: web::Path<NaiveDate>,
+    tera: web::Data<Tera>,
+    pool: web::Data<PgPool>,
+) -> HttpResponse {
+    let workout_date = workout_date.into_inner();
+
+    let rows = sqlx::query_as::<_, TrainingSetDetail>(
+        "SELECT te.event_name, tp.parts_name, ts.weight, ts.times FROM training_set AS ts
+    INNER JOIN training_event AS te ON ts.event_id = te.event_id
+    INNER JOIN training_parts AS tp ON ts.parts_id = tp.parts_id
+    WHERE ts.workout_date =  $1",
+    )
+    .bind(&workout_date)
+    .fetch_all(pool.as_ref())
+    .await
+    .unwrap();
+
+    let mut context = Context::new();
+    context.insert("training_set_detail_list", &rows);
+    context.insert("workout_date", &workout_date);
+
+    let rendered = tera.render("details/detail.tera", &context).unwrap();
+    HttpResponse::Ok().content_type("text/html").body(rendered)
+}
 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
@@ -138,8 +165,7 @@ async fn main() -> std::io::Result<()> {
             .service(dates)
             .service(new_training_set)
             .service(new_log_page)
-            // .service(new)
-            // .service(detail)
+            .service(detail)
             // .service(edit)
             .app_data(web::Data::new(templates))
             .app_data(web::Data::new(pool.clone()))

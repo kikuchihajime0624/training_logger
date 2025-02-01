@@ -1,7 +1,7 @@
 {% extends "base.tera" %}
 
     {% block title %}
-        Detail | {{ trainig_set.workout_date }}
+        Detail | {{ workout_date }}
     {% endblock %}
 
 
@@ -10,24 +10,30 @@
 
 
 <div>
-    <a href="edit.tera">Edit</a>
+    <a href="/detail/edit">Edit</a>
 </div>
 
 
-{% block contents %}
-<div>
-    <dt>種目</dt>
-    <dd>{{ training_event.event_name }}</dd>
+{% block content %}
+    {% for training_set_detail in training_set_detail_list  %}
+    <div>
+        <dl>
 
-    <dt>部位</dt>
-    <dd>{{ training_parts.parts.name}} </dd>
 
-    <dt>重量</dt>
-    <dd>{{ taraining_set.weight}} </dd>
+            <dt>種目</dt>
+            <dd>{{ training_set_detail.event_name }}</dd>
 
-    <dt>回数</dt>
-    <dd>{{ training_set.times}} </dd>
-</div>
+            <dt>部位</dt>
+            <dd>{{ training_set_detail.parts_name }} </dd>
+
+            <dt>重量</dt>
+            <dd>{{ training_set_detail.weight }} </dd>
+
+            <dt>回数</dt>
+            <dd>{{ training_set_detail.times }} </dd>
+        </dl>
+    </div>
+    {% endfor %}
 
 {% endblock %}
 </body>
