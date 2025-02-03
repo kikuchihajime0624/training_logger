@@ -15,11 +15,12 @@
         </div>
 
         <div>
+
             <ul>
 
-                {% for training_set in training_set_list %}
+                {% for workout_date in workout_date_list %}
                 <li>
-                    <a href="/detail/{{ training_set.workout_date }}">{{ training_set.workout_date }}</a>
+                    <a href="/detail/{{ workout_date }}">{{ workout_date }}</a>
                 </li>
                 {% endfor %}
 

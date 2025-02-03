@@ -16,12 +16,22 @@
             </div>
             <div>
                 <label for="event_name">種目</label>
-                <input type="text" id="event_name" name="event_name" required/>
+                <select id="event_name" name="event_name">
+                    {% for event in event_list %}
+                        <option value="{{ event.event_id }}">{{ event.event_name }}</option>
+                    {% endfor %}
+                </select>
+                <input type="text" id="event_name" name="event_name" />
             </div>
 
             <div>
                 <label for="parts_name">部位</label>
-                <input type="text" id="parts_name" name="parts_name" required/>
+                <select id="parts_name" name="parts_name">
+                    {% for parts in parts_list %}
+                        <option value="{{ parts.parts_id }}">{{ parts.parts_name }}</option>
+                    {% endfor %}
+                </select>
+                <input type="text" id="parts_name" name="parts_name" />
             </div>
             <div>
                 <label for="weight">重量</label>

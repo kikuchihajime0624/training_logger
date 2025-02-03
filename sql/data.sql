@@ -6,7 +6,7 @@ VALUES (1,'胸');
 
 
 INSERT INTO training_set (event_id, parts_id, weight, times, workout_date)
-VALUES (1, 1, 150, 5, '2025-02-01');
+VALUES (1, 1, 100, 10, '2025-02-01');
 
 
 
