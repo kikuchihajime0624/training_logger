@@ -1,5 +1,6 @@
 mod details;
 mod new;
+mod db;
 
 use actix_web::{get, web, App, HttpResponse, HttpServer};
 use chrono::NaiveDate;
@@ -9,27 +10,7 @@ use sqlx::{FromRow, PgPool};
 use std::env;
 use tera::{Context, Tera};
 
-#[derive(Debug, Deserialize)]
-struct WorkoutForm {
-    //ユーザーがデータベースに入力する値
-    event_name: String,
-    parts_name: String,
-    weight: i32,
-    times: i32,
-    workout_date: Option<NaiveDate>, // NULLが入るかもしれない時はOptionにする
-}
 
-#[derive(Debug, FromRow, Serialize)]
-struct TrainingSet {
-    //HTMLがデータベースから受け取る値
-    training_set_id: i32,
-    event_id: i32,
-    parts_id: i32,
-    weight: i32,
-    times: i32,
-    workout_date: Option<NaiveDate>,
-    // NULLが入るかもしれない時はOptionにする
-}
 
 #[get("/")]
 async fn dates(tera: web::Data<Tera>, pool: web::Data<PgPool>) -> HttpResponse {

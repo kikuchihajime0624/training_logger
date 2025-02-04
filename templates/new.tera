@@ -1,11 +1,11 @@
 {% extends "base.tera" %}
 
-<title>{% block title %}{% endblock %} |今日の記録をつける</title>
+<title>{% block title %}記録をつける{% endblock %}  </title>
 
 
 {% block content %}
 
-    <h1>今日の記録をつける</h1>
+    <h1>記録をつける</h1>
 
     <form action="/new" method="post">
         <div>
@@ -15,8 +15,9 @@
 
             </div>
             <div>
-                <label for="event_name">種目</label>
-                <select id="event_name" name="event_name">
+                <label for="event_id">種目</label>
+                <select id="event_id" name="event_id">
+                    <option value="">種目を選択</option>
                     {% for event in event_list %}
                         <option value="{{ event.event_id }}">{{ event.event_name }}</option>
                     {% endfor %}
@@ -25,8 +26,9 @@
             </div>
 
             <div>
-                <label for="parts_name">部位</label>
-                <select id="parts_name" name="parts_name">
+                <label for="parts_id">部位</label>
+                <select id="parts_id" name="parts_id">
+                    <option value="">部位を選択</option>
                     {% for parts in parts_list %}
                         <option value="{{ parts.parts_id }}">{{ parts.parts_name }}</option>
                     {% endfor %}
@@ -47,9 +49,5 @@
         <div>
             <input type="submit" value="追加"/>
         </div>
-
     </form>
-
-
-
 {% endblock %}

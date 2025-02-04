@@ -1,20 +1,21 @@
 {% extends "base.tera" %}
 
     {% block title %}
-        Detail | {{ workout_date }}
+        詳細 | {{ workout_date }}
     {% endblock %}
 
+{% block content %}
 
 <body>
 <h1>Detail</h1>
 
 
 <div>
-    <a href="/detail/edit">Edit</a>
+    <a href="/detail/edit">編集する</a>
 </div>
 
 
-{% block content %}
+
     {% for training_set_detail in training_set_detail_list  %}
     <div>
         <dl>
