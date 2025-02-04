@@ -5,18 +5,6 @@ use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, PgPool};
 use tera::{Context, Tera};
 
-#[derive(Debug, Deserialize)]
-struct WorkoutForm {
-    //ユーザーがデータベースに入力する値
-    event_id: Option<i32>,
-    event_name: String,
-    parts_id: Option<i32>,
-    parts_name: String,
-    weight: i32,
-    times: i32,
-    workout_date: Option<NaiveDate>, // NULLが入るかもしれない時はOptionにする
-}
-
 #[derive(Debug, FromRow, Serialize)]
 struct TrainingSet {
     //HTMLがデータベースから受け取る値
@@ -28,8 +16,6 @@ struct TrainingSet {
     workout_date: Option<NaiveDate>,
     // NULLが入るかもしれない時はOptionにする
 }
-
-
 
 #[get("/new")]
 async fn new_log_events(tera: web::Data<Tera>, pool: web::Data<PgPool>) -> HttpResponse {
@@ -44,51 +30,33 @@ async fn new_log_events(tera: web::Data<Tera>, pool: web::Data<PgPool>) -> HttpR
     HttpResponse::Ok().content_type("text/html").body(rendered)
 }
 
+#[derive(Debug, Deserialize)]
+struct WorkoutForm {
+    //ユーザーがデータベースに入力する値
+    event_id: String,
+    event_name: String,
+    parts_id: String,
+    parts_name: String,
+    weight: i32,
+    times: i32,
+    workout_date: Option<NaiveDate>, // NULLが入るかもしれない時はOptionにする
+}
 #[post("/new")]
 async fn new_training_set(pool: web::Data<PgPool>, form: web::Form<WorkoutForm>) -> HttpResponse {
     let workout_form = form.into_inner();
 
-    let mut new_event = if workout_form.event_name.is_empty() == false {
-        ////////////////////////////////////////////////////////////////////////////////
+    let new_event_id = if workout_form.event_name.is_empty() == false {
+       db::new_workout_event_id(&pool, workout_form.event_name).await
 
-        let new_event_id: i32 = sqlx::query_scalar(
-            // db::insert_training_log(&PgPool)
-
-            "
-        INSERT INTO training_event(event_name)
-        VALUES ($1)
-
-        RETURNING event_id
-        ",
-        )
-        .bind(workout_form.event_name)
-        .fetch_one(pool.get_ref())
-        .await
-        .unwrap();
-        new_event_id
-
-        //////
     } else {
-        workout_form.event_id.unwrap()
+        workout_form.event_id.parse().unwrap()
     };
 
-    let new_parts = if workout_form.parts_name.is_empty() == false {
-        let new_parts_id: i32 = sqlx::query_scalar(
-            "
-        INSERT INTO training_parts(parts_name)
-        VALUES ($1)
+    let new_parts_id = if workout_form.parts_name.is_empty() == false {
+       db::new_workout_parts_id(&pool, workout_form.parts_name).await
 
-        RETURNING parts_id
-        ",
-        )
-        .bind(workout_form.parts_name)
-        .fetch_one(pool.get_ref())
-        .await
-        .unwrap();
-
-        new_parts_id
     } else {
-        workout_form.parts_id.unwrap()
+        workout_form.parts_id.parse().unwrap()
     };
 
     sqlx::query(
@@ -96,8 +64,8 @@ async fn new_training_set(pool: web::Data<PgPool>, form: web::Form<WorkoutForm>)
         VALUES ($1, $2, $3, $4, $5 )",
     )
     .bind(workout_form.workout_date)
-    .bind(new_event)
-    .bind(new_parts)
+    .bind(new_event_id)
+    .bind(new_parts_id)
     .bind(workout_form.weight)
     .bind(workout_form.times)
     .execute(pool.as_ref())

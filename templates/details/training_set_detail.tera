@@ -10,12 +10,6 @@
 <h1>Detail</h1>
 
 
-<div>
-    <a href="/detail/edit">編集する</a>
-</div>
-
-
-
     {% for training_set_detail in training_set_detail_list  %}
     <div>
         <dl>
@@ -33,6 +27,10 @@
             <dt>回数</dt>
             <dd>{{ training_set_detail.times }} </dd>
         </dl>
+
+        <div>
+            <a href="/detail/edit">編集する</a>
+        </div>
     </div>
     {% endfor %}
 

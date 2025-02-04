@@ -13,7 +13,7 @@ struct TrainingSetDetail {
     times: i32,
 }
 
-#[get("/detail/{workout_date}")]
+#[get("/training_set/{workout_date}")]
 async fn detail(
     workout_date: web::Path<NaiveDate>,
     tera: web::Data<Tera>,
@@ -37,6 +37,6 @@ async fn detail(
     context.insert("training_set_detail_list", &rows);
     context.insert("workout_date", &workout_date);
 
-    let rendered = tera.render("details/detail.tera", &context).unwrap();
+    let rendered = tera.render("details/training_set_detail.tera", &context).unwrap();
     HttpResponse::Ok().content_type("text/html").body(rendered)
 }

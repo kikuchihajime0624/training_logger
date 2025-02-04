@@ -18,7 +18,7 @@
         <ul>
             {% for workout_date in workout_date_list %}
                 <li>
-                    <a href="/detail/{{ workout_date }}">{{ workout_date }}</a>
+                    <a href="/training_set/{{ workout_date }}">{{ workout_date }}</a>
                 </li>
             {% endfor %}
         </ul>
