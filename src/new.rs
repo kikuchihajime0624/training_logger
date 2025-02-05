@@ -31,7 +31,7 @@ async fn new_log_events(tera: web::Data<Tera>, pool: web::Data<PgPool>) -> HttpR
 }
 
 #[derive(Debug, Deserialize)]
-struct WorkoutForm {
+pub struct WorkoutForm {
     //ユーザーがデータベースに入力する値
     event_id: String,
     event_name: String,
@@ -46,35 +46,33 @@ async fn new_training_set(pool: web::Data<PgPool>, form: web::Form<WorkoutForm>)
     let workout_form = form.into_inner();
 
     let new_event_id = if workout_form.event_name.is_empty() == false {
-       db::new_workout_event_id(&pool, workout_form.event_name).await
-
+        db::new_workout_event_id(&pool, &workout_form.event_name).await
     } else {
-        workout_form.event_id.parse().unwrap()
+        workout_form.event_id.parse::<i32>().unwrap()
     };
 
     let new_parts_id = if workout_form.parts_name.is_empty() == false {
-       db::new_workout_parts_id(&pool, workout_form.parts_name).await
-
+        db::new_workout_parts_id(&pool, &workout_form.parts_name).await
     } else {
-        workout_form.parts_id.parse().unwrap()
+        workout_form.parts_id.parse::<i32>().unwrap()
     };
 
-    sqlx::query(
-        "INSERT INTO training_set(workout_date, event_id, parts_id,  weight, times)
-        VALUES ($1, $2, $3, $4, $5 )",
+    db::insert_training_set(
+       &pool,
+        db::NewWorkout {
+            event_id: new_event_id,
+            event_name: workout_form.event_name,
+            parts_id: new_parts_id,
+            parts_name: workout_form.parts_name,
+            weight: workout_form.weight,
+            times: workout_form.times,
+            workout_date: workout_form.workout_date,
+        },
     )
-    .bind(workout_form.workout_date)
-    .bind(new_event_id)
-    .bind(new_parts_id)
-    .bind(workout_form.weight)
-    .bind(workout_form.times)
-    .execute(pool.as_ref())
-    .await
-    .unwrap();
-
-    ///////////////////////////////////////////////////////////////////////////////////////////
+    .await;
 
     HttpResponse::Found()
         .append_header(("Location", "/"))
         .finish()
+
 }

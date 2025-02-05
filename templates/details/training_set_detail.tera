@@ -6,7 +6,7 @@
 
 {% block content %}
 
-<body>
+
 <h1>Detail</h1>
 
 
@@ -29,10 +29,10 @@
         </dl>
 
         <div>
-            <a href="/detail/edit">編集する</a>
+            <a href="/training_set/{workout_date}/edit">編集する</a> <a href="/detail/edit">削除する</a>
         </div>
     </div>
     {% endfor %}
 
 {% endblock %}
-</body>
+

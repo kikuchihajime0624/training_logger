@@ -40,3 +40,10 @@ async fn detail(
     let rendered = tera.render("details/training_set_detail.tera", &context).unwrap();
     HttpResponse::Ok().content_type("text/html").body(rendered)
 }
+
+
+// edit
+// #[get("/training_set/{workout_date}/edit")]
+// async fn edit_detail(){
+//
+// }

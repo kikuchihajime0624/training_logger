@@ -1,7 +1,7 @@
 use actix_web::web;
 use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
-use sqlx::{pool, FromRow, PgPool};
+use sqlx::{FromRow, PgPool};
 
 //#[get("/new")]
 #[derive(Debug, FromRow, Serialize)]
@@ -31,19 +31,7 @@ pub async fn rows_parts(pool: &PgPool) -> Vec<TrainingPart> {
 
 //#[post("/new")]
 
-#[derive(Debug, Deserialize)]
-struct Workout {
-    //ユーザーがデータベースに入力する値
-    event_id: Option<i32>,
-    event_name: String,
-    parts_id: Option<i32>,
-    parts_name: String,
-    weight: i32,
-    times: i32,
-    workout_date: Option<NaiveDate>, // NULLが入るかもしれない時はOptionにする
-}
-
-pub async fn new_workout_event_id(pool: &PgPool, event_name:String) -> i32 {
+pub async fn new_workout_event_id(pool: &PgPool, event_name: &String) -> i32 {
     sqlx::query_scalar(
         "
         INSERT INTO training_event(event_name)
@@ -56,10 +44,9 @@ pub async fn new_workout_event_id(pool: &PgPool, event_name:String) -> i32 {
     .fetch_one(pool)
     .await
     .unwrap()
-
 }
 
-pub async fn new_workout_parts_id(pool: &PgPool, parts_name:String) -> i32 {
+pub async fn new_workout_parts_id(pool: &PgPool, parts_name: &String) -> i32 {
     sqlx::query_scalar(
         "
         INSERT INTO training_parts(parts_name)
@@ -68,8 +55,46 @@ pub async fn new_workout_parts_id(pool: &PgPool, parts_name:String) -> i32 {
         RETURNING parts_id
         ",
     )
-        .bind(parts_name)
-        .fetch_one(pool)
-        .await
-        .unwrap()
+    .bind(parts_name)
+    .fetch_one(pool)
+    .await
+    .unwrap()
+}
+
+#[derive(Debug, Deserialize)]
+pub struct NewWorkout {
+    pub event_id: i32,
+    pub event_name: String,
+    pub parts_id: i32,
+    pub parts_name: String,
+    pub weight: i32,
+    pub times: i32,
+    pub workout_date: Option<NaiveDate>, // NULLが入るかもしれない時はOptionにする
+}
+
+#[derive(Debug, FromRow, Serialize)]
+pub struct Workout {
+    event_id: i32,
+    event_name: String,
+    parts_id: i32,
+    parts_name: String,
+    weight: i32,
+    times: i32,
+    workout_date: Option<NaiveDate>,
+}
+
+pub async fn insert_training_set(pool: &PgPool, new_workout: NewWorkout)  {
+    sqlx::query(
+        "INSERT INTO training_set(workout_date, event_id, parts_id,  weight, times)
+        VALUES ($1, $2, $3, $4, $5 )",
+    )
+    .bind(&new_workout.workout_date)
+    .bind(&new_workout.event_id)
+    .bind(&new_workout.parts_id)
+    .bind(&new_workout.weight)
+    .bind(&new_workout.times)
+    .execute(pool)
+    .await
+    .unwrap();
+
 }
