@@ -1,52 +1,62 @@
 {% extends "base.tera" %}
 
     {% block title %}
-        編集 | {{ workout_date_list.workout_date }}
+        編集 | {{ workout_date }}
     {% endblock %}
 
 {% block content %}
 
     <h1>記録をつける</h1>
 
-    <form action="/training_set/{workout_date}/edit" method="post">
-        {% for training_set_detail in training_set_detail_list  %}
-        <div>
+    <form action="/training_set/{{ workout_date }}/edit" method="post">
+        {% for training_set_detail in training_set_detail_list %}
             <div>
-                <label for="workout_date">日付</label>
-                <input type="date" id="workout_date" name="workout_date" value="{{ training_set_detail.event_name }}"/>
+                <div>
+                    <label for="workout_date">日付</label>
+                    <input type="date" id="workout_date" name="workout_date"
+                           value="{{ training_set_detail.event_name }}"/>
 
-            </div>
-            <div>
-                <label for="event_id">種目</label>
-                <select id="event_id" name="event_id">
-                    <option value="">{{ training_set_detail.event_name }}</option>
-                    {% for event in event_list %}
-                        <option value="{{ event.event_id }}">{{ event.event_name }}</option>
-                    {% endfor %}
-                </select>
-                <label for="event_name"></label><input type="text" id="event_name" name="event_name" />
-            </div>
+                </div>
+                <div>
+                    <label for="event_id">種目</label>
+                    <select id="event_id" name="event_id">
 
-            <div>
-                <label for="parts_id">部位</label>
-                <select id="parts_id" name="parts_id">
-                    <option value="">{{ training_set_detail.parts_name }}</option>
-                    {% for parts in parts_list %}
-                        <option value="{{ parts.parts_id }}">{{ parts.parts_name }}</option>
-                    {% endfor %}
-                </select>
-                <label for="parts_name"></label><input type="text" id="parts_name" name="parts_name" />
-            </div>
-            <div>
-                <label for="weight">重量</label>
-                <input type="number" id="weight" name="weight" value="{{ training_set_detail.weight }}" required/>
+                        {% for event in event_list %}
+                            <option value="{{ event.event_id }}"
+                                    {% if event.event_id == training_set_detail.event_id %}
+                                        selected
+                                    {% endif %}
+                            >{{ event.event_name }}</option>
+                        {% endfor %}
+                    </select>
+                    <label for="event_name"></label><input type="text" id="event_name" name="event_name"/>
+                </div>
 
+                <div>
+                    <label for="parts_id">部位</label>
+                    <select id="parts_id" name="parts_id">
+
+                        {% for parts in parts_list %}
+                            <option value="{{ parts.parts_id }}"
+                                    {% if parts.parts_id == training_set_detail.parts_id %}
+                                        selected
+                                    {% endif %}
+
+                            >{{ parts.parts_name }}</option>
+                        {% endfor %}
+                    </select>
+                    <label for="parts_name"></label><input type="text" id="parts_name" name="parts_name"/>
+                </div>
+                <div>
+                    <label for="weight">重量</label>
+                    <input type="number" id="weight" name="weight" value="{{ training_set_detail.weight }}" required/>
+
+                </div>
+                <div>
+                    <label for="times">回数</label>
+                    <input type="number" id="times" name="times" value="{{ training_set_detail.times }}" required/>
+                </div>
             </div>
-            <div>
-                <label for="times">回数</label>
-                <input type="number" id="times" name="times"  value="{{ training_set_detail.times }}" required/>
-            </div>
-        </div>
         {% endfor %}
 
         <div>

@@ -103,7 +103,9 @@ pub async fn insert_training_set(pool: &PgPool, new_workout: NewWorkout) {
 pub struct TrainingSetDetail {
     //HTMLがデータベースから受け取る値
     event_name: String,
+    event_id: i32,
     parts_name: String,
+    parts_id: i32,
     weight: i32,
     times: i32,
 }
@@ -112,7 +114,7 @@ pub async fn get_training_set(
     workout_date: &NaiveDate,
 ) -> Vec<TrainingSetDetail>{
     sqlx::query_as::<_, TrainingSetDetail>(
-        "SELECT te.event_name, tp.parts_name, ts.weight, ts.times FROM training_set AS ts
+        "SELECT te.event_name, te.event_id, tp.parts_name, tp.parts_id, ts.weight, ts.times FROM training_set AS ts
     INNER JOIN training_event AS te ON ts.event_id = te.event_id
     INNER JOIN training_parts AS tp ON ts.parts_id = tp.parts_id
     WHERE ts.workout_date = $1

@@ -11,13 +11,15 @@ async fn training_set_detail(
     tera: web::Data<Tera>,
     pool: web::Data<PgPool>,
 ) -> HttpResponse {
+    let  context = Context::new();
     get_training_detail(
         workout_date.into_inner(),
         &tera,
         &pool,
         "details/training_set_detail.tera",
+        context,
     )
-    .await
+        .await
 }
 
 // edit
@@ -27,11 +29,20 @@ async fn training_set_edit(
     tera: web::Data<Tera>,
     pool: web::Data<PgPool>,
 ) -> HttpResponse {
+
+    let rows_event = db::rows_events(&pool).await;
+    let rows_parts = db::rows_parts(&pool).await;
+
+    let  mut context = Context::new();
+    context.insert("event_list", &rows_event);
+    context.insert("parts_list", &rows_parts);
+
     get_training_detail(
         workout_date.into_inner(),
         &tera,
         &pool,
         "details/edit.tera",
+        context,
     )
     .await
 }
@@ -41,11 +52,11 @@ async fn get_training_detail(
     tera: &Tera,
     pool: &PgPool,
     template: &str,
+    mut context: Context,
 ) -> HttpResponse {
-
     let rows = db::get_training_set(&pool, &workout_date_get).await;
 
-    let mut context = Context::new();
+
     context.insert("training_set_detail_list", &rows);
     context.insert("workout_date", &workout_date_get);
 
