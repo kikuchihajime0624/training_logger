@@ -29,7 +29,9 @@
         </dl>
 
         <div>
-            <a href="/training_set/{workout_date}/edit">編集する</a> <a href="/detail/edit">削除する</a>
+            <a href="/training_set/{workout_date}/edit">編集する</a>
+
+            <a href="/detail/edit">削除する</a>
         </div>
     </div>
     {% endfor %}

@@ -33,13 +33,13 @@ async fn new_log_events(tera: web::Data<Tera>, pool: web::Data<PgPool>) -> HttpR
 #[derive(Debug, Deserialize)]
 pub struct WorkoutForm {
     //ユーザーがデータベースに入力する値
-    event_id: String,
-    event_name: String,
-    parts_id: String,
-    parts_name: String,
-    weight: i32,
-    times: i32,
-    workout_date: Option<NaiveDate>, // NULLが入るかもしれない時はOptionにする
+    pub(crate) event_id: String,
+    pub(crate) event_name: String,
+    pub(crate) parts_id: String,
+    pub(crate) parts_name: String,
+    pub(crate) weight: i32,
+    pub(crate) times: i32,
+    pub(crate) workout_date: Option<NaiveDate>, // NULLが入るかもしれない時はOptionにする
 }
 #[post("/new")]
 async fn new_training_set(pool: web::Data<PgPool>, form: web::Form<WorkoutForm>) -> HttpResponse {
@@ -58,7 +58,7 @@ async fn new_training_set(pool: web::Data<PgPool>, form: web::Form<WorkoutForm>)
     };
 
     db::insert_training_set(
-       &pool,
+        &pool,
         db::NewWorkout {
             event_id: new_event_id,
             event_name: workout_form.event_name,
@@ -74,5 +74,4 @@ async fn new_training_set(pool: web::Data<PgPool>, form: web::Form<WorkoutForm>)
     HttpResponse::Found()
         .append_header(("Location", "/"))
         .finish()
-
 }

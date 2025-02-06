@@ -43,7 +43,7 @@
             <label for="times">回数</label>
             <input type="number" id="times" name="times" placeholder="回数を入力" required/>
         </div>
-        </div>
+
 
         <div>
             <input type="submit" value="追加"/>
