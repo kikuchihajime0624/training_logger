@@ -1,4 +1,3 @@
-use actix_web::web;
 use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, PgPool};
@@ -83,7 +82,7 @@ pub struct Workout {
     workout_date: Option<NaiveDate>,
 }
 
-pub async fn insert_training_set(pool: &PgPool, new_workout: NewWorkout)  {
+pub async fn insert_training_set(pool: &PgPool, new_workout: NewWorkout) {
     sqlx::query(
         "INSERT INTO training_set(workout_date, event_id, parts_id,  weight, times)
         VALUES ($1, $2, $3, $4, $5 )",
@@ -96,5 +95,31 @@ pub async fn insert_training_set(pool: &PgPool, new_workout: NewWorkout)  {
     .execute(pool)
     .await
     .unwrap();
+}
 
+//detailのSQL文
+
+#[derive(Debug, FromRow, Serialize)]
+struct TrainingSetDetail {
+    //HTMLがデータベースから受け取る値
+    event_name: String,
+    parts_name: String,
+    weight: i32,
+    times: i32,
+}
+pub async fn get_training_set(
+    pool: &PgPool,
+    workout_date: &NaiveDate,
+) {
+    sqlx::query_as::<_, TrainingSetDetail>(
+        "SELECT te.event_name, tp.parts_name, ts.weight, ts.times FROM training_set AS ts
+    INNER JOIN training_event AS te ON ts.event_id = te.event_id
+    INNER JOIN training_parts AS tp ON ts.parts_id = tp.parts_id
+    WHERE ts.workout_date =  $1
+    ORDER BY training_set_id",
+    )
+    .bind(workout_date)
+    .fetch_all(pool)
+    .await
+    .unwrap();
 }

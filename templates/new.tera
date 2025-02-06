@@ -36,12 +36,12 @@
         </div>
         <div>
             <label for="weight">重量</label>
-            <input type="number" id="weight" name="weight" required/>
+            <input type="number" id="weight" name="weight" placeholder="重量を入力"  required/>
 
         </div>
         <div>
             <label for="times">回数</label>
-            <input type="number" id="times" name="times" required/>
+            <input type="number" id="times" name="times" placeholder="回数を入力" required/>
         </div>
         </div>
 
