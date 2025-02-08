@@ -22,12 +22,14 @@ async fn index(
     pool: web::Data<PgPool>,
     query: web::Query<SelectYearMonth>,
 ) -> HttpResponse {
-    let rows = db::get_training_summary_list(&pool).await;
+
 
     let current_year = Local::now().year();
 
     let selected_year = query.selected_year.unwrap_or(Local::now().year());
-    let selected_month = query.selected_month.unwrap_or(Local::now().month());
+    let selected_month = query.selected_month.unwrap_or(Local::now().month()) as i32;
+
+    let rows = db::get_training_summary_list(&pool, selected_year,  selected_month).await;
 
     let oldest_year = db::get_oldest_year(&pool)
         .await

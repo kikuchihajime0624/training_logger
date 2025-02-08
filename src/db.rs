@@ -7,10 +7,21 @@ pub struct TrainingSummary {
     pub workout_date: NaiveDate,
     pub total_weight: i64,
 }
-pub async fn get_training_summary_list(pool: &PgPool) -> Vec<TrainingSummary> {
+pub async fn get_training_summary_list(
+    pool: &PgPool,
+    selected_year: i32,
+    selected_month: i32,
+) -> Vec<TrainingSummary> {
     sqlx::query_as::<_, TrainingSummary>(
-        "SELECT workout_date, SUM(weight * times) as total_weight  FROM training_set GROUP BY workout_date ORDER BY workout_date DESC",
+        "SELECT workout_date, SUM(weight * times) AS total_weight
+             FROM training_set
+            WHERE EXTRACT(YEAR FROM workout_date) = $1 AND EXTRACT(MONTH FROM workout_date) = $2
+             GROUP BY workout_date
+             ORDER BY workout_date DESC
+             ",
     )
+    .bind(selected_year)
+    .bind(selected_month)
     .fetch_all(pool)
     .await
     .unwrap()
@@ -18,7 +29,7 @@ pub async fn get_training_summary_list(pool: &PgPool) -> Vec<TrainingSummary> {
 
 pub async fn get_oldest_year(pool: &PgPool) -> Option<NaiveDate> {
     sqlx::query_scalar("SELECT MIN(workout_date) FROM training_set")
-        .fetch_optional(pool)
+        .fetch_one(pool)
         .await
         .unwrap()
 }
