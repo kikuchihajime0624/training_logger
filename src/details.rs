@@ -1,5 +1,5 @@
 use crate::db;
-use crate::new::WorkoutForm;
+use crate::new::TrainingSetForm;
 use actix_web::{get, post, web, HttpResponse};
 use chrono::NaiveDate;
 use sqlx::PgPool;
@@ -20,7 +20,7 @@ async fn training_set_detail(
     context.insert("workout_date", &workout_date);
 
     let rendered = tera
-        .render("details/training_set_detail.tera", &context)
+        .render("detail.tera", &context)
         .unwrap();
     HttpResponse::Ok().content_type("text/html").body(rendered)
 }
@@ -45,42 +45,40 @@ async fn training_set_edit(
     context.insert("training_set_detail", &rows);
     context.insert("workout_date", &workout_date);
 
-    let rendered = tera.render("details/edit.tera", &context).unwrap();
+    let rendered = tera.render("edit.tera", &context).unwrap();
     HttpResponse::Ok().content_type("text/html").body(rendered)
 }
 
 #[post("/training_set/{workout_date}/edit/{training_set_id}")]
 async fn update_training_set(
     pool: web::Data<PgPool>,
-    form: web::Form<WorkoutForm>,
+    form: web::Form<TrainingSetForm>,
     path: web::Path<(NaiveDate, i32)>,
 ) -> HttpResponse {
-    let workout_form = form.into_inner();
+    let training_set_form = form.into_inner();
     let (workout_date, training_set_id) = path.into_inner();
 
-    let new_event_id = if workout_form.event_name.is_empty() == false {
-        db::register_training_event(&pool, &workout_form.event_name).await
+    let new_event_id = if training_set_form.event_name.is_empty() == false {
+        db::register_training_event(&pool, &training_set_form.event_name).await
     } else {
-        workout_form.event_id.parse::<i32>().unwrap()
+        training_set_form.event_id.parse::<i32>().unwrap()
     };
 
-    let new_parts_id = if workout_form.parts_name.is_empty() == false {
-        db::register_training_parts(&pool, &workout_form.parts_name).await
+    let new_parts_id = if training_set_form.parts_name.is_empty() == false {
+        db::register_training_parts(&pool, &training_set_form.parts_name).await
     } else {
-        workout_form.parts_id.parse::<i32>().unwrap()
+        training_set_form.parts_id.parse::<i32>().unwrap()
     };
 
     db::update_training_set(
         &pool,
-        db::TrainingSetDetail {
+        db::TrainingSet {
             training_set_id,
             event_id: new_event_id,
-            event_name: workout_form.event_name,
             parts_id: new_parts_id,
-            parts_name: workout_form.parts_name,
-            weight: workout_form.weight,
-            times: workout_form.times,
-            workout_date: workout_form.workout_date,
+            weight: training_set_form.weight,
+            times: training_set_form.times,
+            workout_date: training_set_form.workout_date,
         },
     )
     .await;

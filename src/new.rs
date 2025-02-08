@@ -31,7 +31,7 @@ async fn new_log_events(tera: web::Data<Tera>, pool: web::Data<PgPool>) -> HttpR
 }
 
 #[derive(Debug, Deserialize)]
-pub struct WorkoutForm {
+pub struct TrainingSetForm {
     //ユーザーがデータベースに入力する値
     pub(crate) event_id: String,
     pub(crate) event_name: String,
@@ -42,19 +42,19 @@ pub struct WorkoutForm {
     pub(crate) workout_date: Option<NaiveDate>, // NULLが入るかもしれない時はOptionにする
 }
 #[post("/new")]
-async fn new_training_set(pool: web::Data<PgPool>, form: web::Form<WorkoutForm>) -> HttpResponse {
-    let workout_form = form.into_inner();
+async fn new_training_set(pool: web::Data<PgPool>, form: web::Form<TrainingSetForm>) -> HttpResponse {
+    let training_set_form = form.into_inner();
 
-    let new_event_id = if workout_form.event_name.is_empty() == false {
-        db::register_training_event(&pool, &workout_form.event_name).await
+    let new_event_id = if training_set_form.event_name.is_empty() == false {
+        db::register_training_event(&pool, &training_set_form.event_name).await
     } else {
-        workout_form.event_id.parse::<i32>().unwrap()
+        training_set_form.event_id.parse::<i32>().unwrap()
     };
 
-    let new_parts_id = if workout_form.parts_name.is_empty() == false {
-        db::register_training_parts(&pool, &workout_form.parts_name).await
+    let new_parts_id = if training_set_form.parts_name.is_empty() == false {
+        db::register_training_parts(&pool, &training_set_form.parts_name).await
     } else {
-        workout_form.parts_id.parse::<i32>().unwrap()
+        training_set_form.parts_id.parse::<i32>().unwrap()
     };
 
     db::register_training_set(
@@ -62,12 +62,12 @@ async fn new_training_set(pool: web::Data<PgPool>, form: web::Form<WorkoutForm>)
         db::NewTrainingSet {
             event_id: new_event_id,
             parts_id: new_parts_id,
-            weight: workout_form.weight,
-            times: workout_form.times,
-            workout_date: workout_form.workout_date,
+            weight: training_set_form.weight,
+            times: training_set_form.times,
+            workout_date: training_set_form.workout_date,
         },
     )
-    .await;
+        .await;
 
     HttpResponse::Found()
         .append_header(("Location", "/"))

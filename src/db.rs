@@ -66,16 +66,16 @@ pub struct NewTrainingSet {
     pub workout_date: Option<NaiveDate>, // NULLが入るかもしれない時はOptionにする
 }
 
-pub async fn register_training_set(pool: &PgPool, new_workout: NewTrainingSet) {
+pub async fn register_training_set(pool: &PgPool, new_training_set: NewTrainingSet) {
     sqlx::query(
         "INSERT INTO training_set(workout_date, event_id, parts_id,  weight, times)
         VALUES ($1, $2, $3, $4, $5 )",
     )
-    .bind(&new_workout.workout_date)
-    .bind(&new_workout.event_id)
-    .bind(&new_workout.parts_id)
-    .bind(&new_workout.weight)
-    .bind(&new_workout.times)
+    .bind(&new_training_set.workout_date)
+    .bind(&new_training_set.event_id)
+    .bind(&new_training_set.parts_id)
+    .bind(&new_training_set.weight)
+    .bind(&new_training_set.times)
     .execute(pool)
     .await
     .unwrap();
@@ -126,19 +126,29 @@ pub async fn get_training_set_by_id(pool: &PgPool, training_set_id: i32) -> Trai
         .unwrap()
 }
 
-pub async fn update_training_set(pool: &PgPool, update_workout: TrainingSetDetail) {
+
+#[derive(Debug, Deserialize)]
+pub struct TrainingSet {
+    pub training_set_id: i32,
+    pub event_id: i32,
+    pub parts_id: i32,
+    pub weight: i32,
+    pub times: i32,
+    pub workout_date: Option<NaiveDate>, // NULLが入るかもしれない時はOptionにする
+}
+pub async fn update_training_set(pool: &PgPool, update_training_set: TrainingSet) {
     sqlx::query(
         "UPDATE training_set
             SET workout_date = $1, event_id = $2, parts_id = $3,  weight = $4, times = $5
 
             WHERE training_set_id = $6",
     )
-    .bind(&update_workout.workout_date)
-    .bind(&update_workout.event_id)
-    .bind(&update_workout.parts_id)
-    .bind(&update_workout.weight)
-    .bind(&update_workout.times)
-    .bind(&update_workout.training_set_id)
+    .bind(&update_training_set.workout_date)
+    .bind(&update_training_set.event_id)
+    .bind(&update_training_set.parts_id)
+    .bind(&update_training_set.weight)
+    .bind(&update_training_set.times)
+    .bind(&update_training_set.training_set_id)
     .execute(pool)
     .await
     .unwrap();

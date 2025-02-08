@@ -11,7 +11,7 @@ use std::env;
 use tera::{Context, Tera};
 
 #[get("/")]
-async fn dates(tera: web::Data<Tera>, pool: web::Data<PgPool>) -> HttpResponse {
+async fn index(tera: web::Data<Tera>, pool: web::Data<PgPool>) -> HttpResponse {
     let rows = sqlx::query_scalar::<_, NaiveDate>(
         "SELECT DISTINCT workout_date FROM training_set ORDER BY workout_date DESC",
     )
@@ -22,7 +22,7 @@ async fn dates(tera: web::Data<Tera>, pool: web::Data<PgPool>) -> HttpResponse {
     let mut context = Context::new();
     context.insert("workout_date_list", &rows);
 
-    let rendered = tera.render("training_logger.tera", &context).unwrap();
+    let rendered = tera.render("index.tera", &context).unwrap();
     HttpResponse::Ok().content_type("text/html").body(rendered)
 }
 
@@ -44,7 +44,7 @@ async fn main() -> std::io::Result<()> {
         let mut templates = Tera::new("templates/**/*").expect("error in tera/templates");
         templates.autoescape_on(vec!["tera"]);
         App::new()
-            .service(dates)
+            .service(index)
             .service(new::new_training_set)
             .service(new::new_log_events)
             .service(details::training_set_detail)
