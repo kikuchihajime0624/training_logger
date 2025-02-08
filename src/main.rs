@@ -3,18 +3,42 @@ mod details;
 mod new;
 
 use actix_web::{get, web, App, HttpResponse, HttpServer};
+use chrono::{Datelike, Local};
 use dotenvy::dotenv;
-
+use serde::Deserialize;
 use sqlx::PgPool;
 use std::env;
 use tera::{Context, Tera};
 
+#[derive(Debug, Deserialize)]
+struct SelectYearMonth {
+    selected_year: Option<i32>,
+    selected_month: Option<u32>,
+}
+
 #[get("/")]
-async fn index(tera: web::Data<Tera>, pool: web::Data<PgPool>) -> HttpResponse {
-    let rows = db::get_workout_data_list(&pool).await;
+async fn index(
+    tera: web::Data<Tera>,
+    pool: web::Data<PgPool>,
+    query: web::Query<SelectYearMonth>,
+) -> HttpResponse {
+    let rows = db::get_training_summary_list(&pool).await;
+
+    let current_year = Local::now().year();
+
+    let selected_year = query.selected_year.unwrap_or(Local::now().year());
+    let selected_month = query.selected_month.unwrap_or(Local::now().month());
+
+    let oldest_year = db::get_oldest_year(&pool)
+        .await
+        .map(|workout_date| workout_date.year()).unwrap_or(current_year);
 
     let mut context = Context::new();
-    context.insert("workout_date_list", &rows);
+    context.insert("training_summary_list", &rows);
+    context.insert("selected_year", &selected_year);
+    context.insert("selected_month", &selected_month);
+    context.insert("oldest_year", &oldest_year);
+    context.insert("current_year", &current_year);
 
     let rendered = tera.render("index.tera", &context).unwrap();
     HttpResponse::Ok().content_type("text/html").body(rendered)

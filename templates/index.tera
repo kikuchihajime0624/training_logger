@@ -12,13 +12,48 @@
                 記録をつける
             {% endblock %}
         </a>
+
+
+    </div>
+    <div>
+        <form action="/" method="get">
+
+            <select id="selected_year" name="selected_year">
+                {% for year in range(start = oldest_year, end = (current_year + 1)) %}
+                    <option value="{{ year }}"
+                            {% if year == selected_year %}
+                                selected
+                            {% endif %}
+                    >{{ year }}</option>
+                {% endfor %}
+            </select>
+            年
+
+
+            <select id="selected_month" name="selected_month">
+                {% for month in range(start = 1, end = 13) %}
+                    <option value="{{ month }}"
+                            {% if month == selected_month %}
+                                selected
+                            {% endif %}
+                    >{{ month }}</option>
+                {% endfor %}
+            </select>
+            月
+
+            <button>検索</button>
+        </form>
+
+
     </div>
 
     <div>
+
         <ul>
-            {% for workout_date in workout_date_list %}
+            {% for training_summary in training_summary_list %}
                 <li>
-                    <a href="/training_set/{{ workout_date }}">{{ workout_date }}</a>
+                    <a href="/training_set/{{ training_summary.workout_date }}">{{ training_summary.workout_date }}</a>
+                    総重量{{ training_summary.total_weight }}㎏
                 </li>
             {% endfor %}
         </ul>

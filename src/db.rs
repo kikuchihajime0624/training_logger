@@ -2,15 +2,26 @@ use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, PgPool};
 
-pub async fn get_workout_data_list(pool: &PgPool) -> Vec<NaiveDate> {
-    sqlx::query_scalar::<_, NaiveDate>(
-        "SELECT DISTINCT workout_date FROM training_set ORDER BY workout_date DESC",
+#[derive(Debug, FromRow, Serialize)]
+pub struct TrainingSummary {
+    pub workout_date: NaiveDate,
+    pub total_weight: i64,
+}
+pub async fn get_training_summary_list(pool: &PgPool) -> Vec<TrainingSummary> {
+    sqlx::query_as::<_, TrainingSummary>(
+        "SELECT workout_date, SUM(weight * times) as total_weight  FROM training_set GROUP BY workout_date ORDER BY workout_date DESC",
     )
     .fetch_all(pool)
     .await
     .unwrap()
 }
 
+pub async fn get_oldest_year(pool: &PgPool) -> Option<NaiveDate> {
+    sqlx::query_scalar("SELECT MIN(workout_date) FROM training_set")
+        .fetch_optional(pool)
+        .await
+        .unwrap()
+}
 
 #[derive(Debug, FromRow, Serialize)]
 pub struct TrainingEvent {
