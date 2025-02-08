@@ -22,14 +22,12 @@ async fn index(
     pool: web::Data<PgPool>,
     query: web::Query<SelectYearMonth>,
 ) -> HttpResponse {
-
-
     let current_year = Local::now().year();
 
     let selected_year = query.selected_year.unwrap_or(Local::now().year());
     let selected_month = query.selected_month.unwrap_or(Local::now().month()) as i32;
 
-    let rows = db::get_training_summary_list(&pool, selected_year,  selected_month).await;
+    let rows = db::get_training_summary_list(&pool, selected_year, selected_month).await;
 
     let oldest_year = db::get_oldest_year(&pool)
         .await
@@ -74,7 +72,7 @@ async fn main() -> std::io::Result<()> {
             .app_data(web::Data::new(templates))
             .app_data(web::Data::new(pool.clone()))
     })
-    .bind(("0.0.0.0", port))?
-    .run()
-    .await
+        .bind(("0.0.0.0", port))?
+        .run()
+        .await
 }

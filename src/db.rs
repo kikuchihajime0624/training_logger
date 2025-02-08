@@ -20,11 +20,11 @@ pub async fn get_training_summary_list(
              ORDER BY workout_date DESC
              ",
     )
-    .bind(selected_year)
-    .bind(selected_month)
-    .fetch_all(pool)
-    .await
-    .unwrap()
+        .bind(selected_year)
+        .bind(selected_month)
+        .fetch_all(pool)
+        .await
+        .unwrap()
 }
 
 pub async fn get_oldest_year(pool: &PgPool) -> Option<NaiveDate> {
@@ -68,10 +68,10 @@ pub async fn register_training_event(pool: &PgPool, event_name: &String) -> i32 
         RETURNING event_id
         ",
     )
-    .bind(event_name)
-    .fetch_one(pool)
-    .await
-    .unwrap()
+        .bind(event_name)
+        .fetch_one(pool)
+        .await
+        .unwrap()
 }
 
 pub async fn register_training_parts(pool: &PgPool, parts_name: &String) -> i32 {
@@ -83,10 +83,10 @@ pub async fn register_training_parts(pool: &PgPool, parts_name: &String) -> i32 
         RETURNING parts_id
         ",
     )
-    .bind(parts_name)
-    .fetch_one(pool)
-    .await
-    .unwrap()
+        .bind(parts_name)
+        .fetch_one(pool)
+        .await
+        .unwrap()
 }
 
 #[derive(Debug, Deserialize)]
@@ -95,7 +95,7 @@ pub struct NewTrainingSet {
     pub parts_id: i32,
     pub weight: i32,
     pub times: i32,
-    pub workout_date: Option<NaiveDate>, // NULLが入るかもしれない時はOptionにする
+    pub workout_date: NaiveDate,
 }
 
 pub async fn register_training_set(pool: &PgPool, new_training_set: NewTrainingSet) {
@@ -103,19 +103,18 @@ pub async fn register_training_set(pool: &PgPool, new_training_set: NewTrainingS
         "INSERT INTO training_set(workout_date, event_id, parts_id,  weight, times)
         VALUES ($1, $2, $3, $4, $5 )",
     )
-    .bind(&new_training_set.workout_date)
-    .bind(&new_training_set.event_id)
-    .bind(&new_training_set.parts_id)
-    .bind(&new_training_set.weight)
-    .bind(&new_training_set.times)
-    .execute(pool)
-    .await
-    .unwrap();
+        .bind(&new_training_set.workout_date)
+        .bind(&new_training_set.event_id)
+        .bind(&new_training_set.parts_id)
+        .bind(&new_training_set.weight)
+        .bind(&new_training_set.times)
+        .execute(pool)
+        .await
+        .unwrap();
 }
 
 #[derive(Debug, FromRow, Serialize)]
 pub struct TrainingSetDetail {
-    //HTMLがデータベースから受け取る値
     pub training_set_id: i32,
     pub event_name: String,
     pub event_id: i32,
@@ -123,7 +122,7 @@ pub struct TrainingSetDetail {
     pub parts_id: i32,
     pub weight: i32,
     pub times: i32,
-    pub workout_date: Option<NaiveDate>,
+    pub workout_date: NaiveDate,
 }
 pub async fn get_training_set_by_workout_date(
     pool: &PgPool,
@@ -137,10 +136,10 @@ pub async fn get_training_set_by_workout_date(
             WHERE ts.workout_date = $1
             ORDER BY ts.training_set_id",
     )
-    .bind(workout_date)
-    .fetch_all(pool)
-    .await
-    .unwrap()
+        .bind(workout_date)
+        .fetch_all(pool)
+        .await
+        .unwrap()
 }
 
 pub async fn get_training_set_by_id(pool: &PgPool, training_set_id: i32) -> TrainingSetDetail {
@@ -165,7 +164,7 @@ pub struct TrainingSet {
     pub parts_id: i32,
     pub weight: i32,
     pub times: i32,
-    pub workout_date: Option<NaiveDate>, // NULLが入るかもしれない時はOptionにする
+    pub workout_date: NaiveDate,
 }
 pub async fn update_training_set(pool: &PgPool, update_training_set: TrainingSet) {
     sqlx::query(
@@ -174,15 +173,15 @@ pub async fn update_training_set(pool: &PgPool, update_training_set: TrainingSet
 
             WHERE training_set_id = $6",
     )
-    .bind(&update_training_set.workout_date)
-    .bind(&update_training_set.event_id)
-    .bind(&update_training_set.parts_id)
-    .bind(&update_training_set.weight)
-    .bind(&update_training_set.times)
-    .bind(&update_training_set.training_set_id)
-    .execute(pool)
-    .await
-    .unwrap();
+        .bind(&update_training_set.workout_date)
+        .bind(&update_training_set.event_id)
+        .bind(&update_training_set.parts_id)
+        .bind(&update_training_set.weight)
+        .bind(&update_training_set.times)
+        .bind(&update_training_set.training_set_id)
+        .execute(pool)
+        .await
+        .unwrap();
 }
 
 pub async fn delete_training_set(pool: &PgPool, training_set_id: i32) {
@@ -190,8 +189,8 @@ pub async fn delete_training_set(pool: &PgPool, training_set_id: i32) {
         "DELETE FROM training_set
              WHERE training_set_id = $1",
     )
-    .bind(training_set_id)
-    .execute(pool)
-    .await
-    .unwrap();
+        .bind(training_set_id)
+        .execute(pool)
+        .await
+        .unwrap();
 }

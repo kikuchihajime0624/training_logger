@@ -81,7 +81,7 @@ async fn update_training_set(
             workout_date: training_set_form.workout_date,
         },
     )
-    .await;
+        .await;
 
     HttpResponse::Found()
         .append_header(("Location", format!("/training_set/{}", workout_date)))

@@ -7,14 +7,12 @@ use tera::{Context, Tera};
 
 #[derive(Debug, FromRow, Serialize)]
 struct TrainingSet {
-    //HTMLがデータベースから受け取る値
     training_set_id: i32,
     event_id: i32,
     parts_id: i32,
     weight: i32,
     times: i32,
-    workout_date: Option<NaiveDate>,
-    // NULLが入るかもしれない時はOptionにする
+    workout_date: NaiveDate,
 }
 
 #[get("/new")]
@@ -39,10 +37,13 @@ pub struct TrainingSetForm {
     pub(crate) parts_name: String,
     pub(crate) weight: i32,
     pub(crate) times: i32,
-    pub(crate) workout_date: Option<NaiveDate>, // NULLが入るかもしれない時はOptionにする
+    pub(crate) workout_date: NaiveDate,
 }
 #[post("/new")]
-async fn new_training_set(pool: web::Data<PgPool>, form: web::Form<TrainingSetForm>) -> HttpResponse {
+async fn new_training_set(
+    pool: web::Data<PgPool>,
+    form: web::Form<TrainingSetForm>,
+) -> HttpResponse {
     let training_set_form = form.into_inner();
 
     let new_event_id = if training_set_form.event_name.is_empty() == false {
@@ -70,6 +71,9 @@ async fn new_training_set(pool: web::Data<PgPool>, form: web::Form<TrainingSetFo
         .await;
 
     HttpResponse::Found()
-        .append_header(("Location", "/"))
+        .append_header((
+            "Location",
+            format!("/training_set/{}", training_set_form.workout_date),
+        ))
         .finish()
 }
