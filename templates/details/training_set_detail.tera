@@ -7,33 +7,36 @@
 {% block content %}
 
 
-<h1>Detail</h1>
+    <h1>Detail</h1>
 
 
-    {% for training_set_detail in training_set_detail_list  %}
-    <div>
-        <dl>
-
-
-            <dt>種目</dt>
-            <dd>{{ training_set_detail.event_name }}</dd>
-
-            <dt>部位</dt>
-            <dd>{{ training_set_detail.parts_name }} </dd>
-
-            <dt>重量</dt>
-            <dd>{{ training_set_detail.weight }} </dd>
-
-            <dt>回数</dt>
-            <dd>{{ training_set_detail.times }} </dd>
-        </dl>
-
+    {% for training_set_detail in training_set_detail_list %}
         <div>
-            <a href="/training_set/{{workout_date}}/edit/{{ training_set_detail.training_set_id }}">編集する</a>
+            <dl>
 
-            <a href="/detail/edit">削除する</a>
+
+                <dt>種目</dt>
+                <dd>{{ training_set_detail.event_name }}</dd>
+
+                <dt>部位</dt>
+                <dd>{{ training_set_detail.parts_name }} </dd>
+
+                <dt>重量</dt>
+                <dd>{{ training_set_detail.weight }} </dd>
+
+                <dt>回数</dt>
+                <dd>{{ training_set_detail.times }} </dd>
+            </dl>
+
+            <div>
+                <a href="/training_set/{{ workout_date }}/edit/{{ training_set_detail.training_set_id }}">編集する</a>
+
+                <form action="/training_set/{{ workout_date }}/delete/{{ training_set_detail.training_set_id }}"
+                      method="post">
+                    <button>削除する</button>
+                </form>
+            </div>
         </div>
-    </div>
     {% endfor %}
 
 {% endblock %}

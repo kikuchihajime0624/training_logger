@@ -49,7 +49,6 @@ async fn training_set_edit(
     HttpResponse::Ok().content_type("text/html").body(rendered)
 }
 
-
 #[post("/training_set/{workout_date}/edit/{training_set_id}")]
 async fn update_training_set(
     pool: web::Data<PgPool>,
@@ -84,9 +83,21 @@ async fn update_training_set(
             workout_date: workout_form.workout_date,
         },
     )
-        .await;
+    .await;
 
+    HttpResponse::Found()
+        .append_header(("Location", format!("/training_set/{}", workout_date)))
+        .finish()
+}
 
+#[post("/training_set/{workout_date}/delete/{training_set_id}")]
+async fn delete_training_set(
+    pool: web::Data<PgPool>,
+    path: web::Path<(NaiveDate, i32)>,
+) -> HttpResponse {
+    let (workout_date, training_set_id) = path.into_inner();
+
+    db::delete_training_set(&pool, training_set_id).await;
 
     HttpResponse::Found()
         .append_header(("Location", format!("/training_set/{}", workout_date)))

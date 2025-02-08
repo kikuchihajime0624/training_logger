@@ -52,6 +52,7 @@ async fn main() -> std::io::Result<()> {
             .service(details::training_set_detail)
             .service(details::training_set_edit)
             .service(details::update_training_set)
+            .service(details::delete_training_set)
             .app_data(web::Data::new(templates))
             .app_data(web::Data::new(pool.clone()))
     })

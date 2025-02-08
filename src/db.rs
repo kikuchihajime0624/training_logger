@@ -1,3 +1,4 @@
+use actix_web::web;
 use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, PgPool};
@@ -70,9 +71,6 @@ pub struct NewTrainingSet {
     pub times: i32,
     pub workout_date: Option<NaiveDate>, // NULLが入るかもしれない時はOptionにする
 }
-
-
-
 
 pub async fn insert_training_set(pool: &PgPool, new_workout: NewTrainingSet) {
     sqlx::query(
@@ -160,6 +158,17 @@ pub async fn update_training_set(pool: &PgPool, update_workout: TrainingSetDetai
     .bind(&update_workout.weight)
     .bind(&update_workout.times)
     .bind(&update_workout.training_set_id)
+    .execute(pool)
+    .await
+    .unwrap();
+}
+
+pub async fn delete_training_set(pool: &PgPool, training_set_id: i32) {
+    sqlx::query(
+        "DELETE FROM training_set
+             WHERE training_set_id = $1",
+    )
+    .bind(training_set_id)
     .execute(pool)
     .await
     .unwrap();
