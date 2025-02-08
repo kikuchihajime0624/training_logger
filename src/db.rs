@@ -105,7 +105,7 @@ pub struct TrainingSetDetail {
 }
 pub async fn get_training_set(pool: &PgPool, workout_date: &NaiveDate) -> Vec<TrainingSetDetail> {
     sqlx::query_as::<_, TrainingSetDetail>(
-        "SELECT ts.training_set_id, te.event_name, te.event_id, tp.parts_name, tp.parts_id, ts.weight, ts.times
+        "SELECT ts.training_set_id, te.event_name, te.event_id, tp.parts_name, tp.parts_id, ts.weight, ts.times, ts.workout_date
             FROM training_set AS ts
             INNER JOIN training_event AS te ON ts.event_id = te.event_id
             INNER JOIN training_parts AS tp ON ts.parts_id = tp.parts_id
@@ -152,7 +152,7 @@ pub async fn update_training_set(pool: &PgPool, update_workout: TrainingSetDetai
         "UPDATE training_set
             SET workout_date = $1, event_id = $2, parts_id = $3,  weight = $4, times = $5
 
-            WHERE ts.training_set_id = $6",
+            WHERE training_set_id = $6",
     )
     .bind(&update_workout.workout_date)
     .bind(&update_workout.event_id)

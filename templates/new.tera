@@ -46,7 +46,7 @@
 
 
         <div>
-            <input type="submit" value="追加"/>
+            <button type="submit" >追加</button>
         </div>
     </form>
 {% endblock %}

@@ -50,14 +50,14 @@ async fn training_set_edit(
 }
 
 
-
-
 #[post("/training_set/{workout_date}/edit/{training_set_id}")]
 async fn update_training_set(
     pool: web::Data<PgPool>,
     form: web::Form<WorkoutForm>,
+    path: web::Path<(NaiveDate, i32)>,
 ) -> HttpResponse {
     let workout_form = form.into_inner();
+    let (workout_date, training_set_id) = path.into_inner();
 
     let new_event_id = if workout_form.event_name.is_empty() == false {
         db::new_workout_event_id(&pool, &workout_form.event_name).await
@@ -74,7 +74,7 @@ async fn update_training_set(
     db::update_training_set(
         &pool,
         db::TrainingSetDetail {
-            training_set_id: 0,
+            training_set_id,
             event_id: new_event_id,
             event_name: workout_form.event_name,
             parts_id: new_parts_id,
@@ -84,9 +84,11 @@ async fn update_training_set(
             workout_date: workout_form.workout_date,
         },
     )
-    .await;
+        .await;
+
+
 
     HttpResponse::Found()
-        .append_header(("Location", "/"))
+        .append_header(("Location", format!("/training_set/{}", workout_date)))
         .finish()
 }
