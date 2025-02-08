@@ -1,16 +1,14 @@
+mod db;
 mod details;
 mod new;
-mod db;
 
 use actix_web::{get, web, App, HttpResponse, HttpServer};
 use chrono::NaiveDate;
 use dotenvy::dotenv;
 
-use sqlx::{PgPool};
+use sqlx::PgPool;
 use std::env;
 use tera::{Context, Tera};
-
-
 
 #[get("/")]
 async fn dates(tera: web::Data<Tera>, pool: web::Data<PgPool>) -> HttpResponse {

@@ -61,9 +61,7 @@ async fn new_training_set(pool: web::Data<PgPool>, form: web::Form<WorkoutForm>)
         &pool,
         db::NewTrainingSet {
             event_id: new_event_id,
-            event_name: workout_form.event_name,
             parts_id: new_parts_id,
-            parts_name: workout_form.parts_name,
             weight: workout_form.weight,
             times: workout_form.times,
             workout_date: workout_form.workout_date,

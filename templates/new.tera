@@ -38,7 +38,7 @@
         </div>
         <div>
             <label for="weight">重量</label>
-            <input type="number" id="weight" name="weight" placeholder="重量を入力"  required/>
+            <input type="number" id="weight" name="weight" placeholder="重量を入力" required/>
 
         </div>
         <div>
@@ -48,7 +48,7 @@
 
 
         <div>
-            <button type="submit" >追加</button>
+            <button type="submit">追加</button>
         </div>
     </form>
 {% endblock %}

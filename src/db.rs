@@ -2,7 +2,6 @@ use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, PgPool};
 
-
 #[derive(Debug, FromRow, Serialize)]
 pub struct TrainingEvent {
     pub event_id: i32,
@@ -26,10 +25,7 @@ pub async fn get_parts(pool: &PgPool) -> Vec<TrainingPart> {
         .fetch_all(pool)
         .await
         .unwrap()
-
 }
-
-
 
 pub async fn register_training_event(pool: &PgPool, event_name: &String) -> i32 {
     sqlx::query_scalar(
@@ -64,9 +60,7 @@ pub async fn register_training_parts(pool: &PgPool, parts_name: &String) -> i32 
 #[derive(Debug, Deserialize)]
 pub struct NewTrainingSet {
     pub event_id: i32,
-    pub event_name: String,
     pub parts_id: i32,
-    pub parts_name: String,
     pub weight: i32,
     pub times: i32,
     pub workout_date: Option<NaiveDate>, // NULLが入るかもしれない時はOptionにする
@@ -87,8 +81,6 @@ pub async fn register_training_set(pool: &PgPool, new_workout: NewTrainingSet) {
     .unwrap();
 }
 
-
-
 #[derive(Debug, FromRow, Serialize)]
 pub struct TrainingSetDetail {
     //HTMLがデータベースから受け取る値
@@ -101,7 +93,10 @@ pub struct TrainingSetDetail {
     pub times: i32,
     pub workout_date: Option<NaiveDate>,
 }
-pub async fn get_training_set_by_workout_date(pool: &PgPool, workout_date: &NaiveDate) -> Vec<TrainingSetDetail> {
+pub async fn get_training_set_by_workout_date(
+    pool: &PgPool,
+    workout_date: &NaiveDate,
+) -> Vec<TrainingSetDetail> {
     sqlx::query_as::<_, TrainingSetDetail>(
         "SELECT ts.training_set_id, te.event_name, te.event_id, tp.parts_name, tp.parts_id, ts.weight, ts.times, ts.workout_date
             FROM training_set AS ts
