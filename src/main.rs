@@ -8,6 +8,7 @@ use dotenvy::dotenv;
 use serde::Deserialize;
 use sqlx::PgPool;
 use std::env;
+use actix_files::Files;
 use tera::{Context, Tera};
 
 #[derive(Debug, Deserialize)]
@@ -69,8 +70,10 @@ async fn main() -> std::io::Result<()> {
             .service(details::training_set_edit)
             .service(details::update_training_set)
             .service(details::delete_training_set)
+            .service(Files::new("/static", "./static"))
             .app_data(web::Data::new(templates))
             .app_data(web::Data::new(pool.clone()))
+
     })
         .bind(("0.0.0.0", port))?
         .run()

@@ -31,10 +31,10 @@ async fn new_log_events(tera: web::Data<Tera>, pool: web::Data<PgPool>) -> HttpR
 #[derive(Debug, Deserialize)]
 pub struct TrainingSetForm {
     //ユーザーがデータベースに入力する値
-    pub(crate) event_id: String,
-    pub(crate) event_name: String,
-    pub(crate) parts_id: String,
-    pub(crate) parts_name: String,
+    pub(crate) event_id: Option<i32>,
+    pub(crate) event_name: Option<String>,
+    pub(crate) parts_id: Option<i32>,
+    pub(crate) parts_name: Option<String>,
     pub(crate) weight: i32,
     pub(crate) times: i32,
     pub(crate) workout_date: NaiveDate,
@@ -46,16 +46,16 @@ async fn new_training_set(
 ) -> HttpResponse {
     let training_set_form = form.into_inner();
 
-    let new_event_id = if training_set_form.event_name.is_empty() == false {
-        db::register_training_event(&pool, &training_set_form.event_name).await
+    let new_event_id = if training_set_form.event_name.is_some()  {
+        db::register_training_event(&pool, &training_set_form.event_name.unwrap()).await
     } else {
-        training_set_form.event_id.parse::<i32>().unwrap()
+        training_set_form.event_id.unwrap()
     };
 
-    let new_parts_id = if training_set_form.parts_name.is_empty() == false {
-        db::register_training_parts(&pool, &training_set_form.parts_name).await
+    let new_parts_id = if training_set_form.parts_name.is_some() {
+        db::register_training_parts(&pool, &training_set_form.parts_name.unwrap()).await
     } else {
-        training_set_form.parts_id.parse::<i32>().unwrap()
+        training_set_form.parts_id.unwrap()
     };
 
     db::register_training_set(

@@ -4,6 +4,10 @@
         編集 | {{ workout_date }}
     {% endblock %}
 
+{% block script %}
+    <script src="/static/js/training_set_form.js" defer></script>
+{% endblock %}
+
 {% block content %}
 
     <h1>記録をつける</h1>
@@ -14,13 +18,13 @@
             <div>
                 <label for="workout_date">日付</label>
                 <input type="date" id="workout_date" name="workout_date"
-                       value="{{ workout_date }}"/>
+                       value="{{ workout_date }}" required />
 
             </div>
             <div>
                 <label for="event_id">種目</label>
                 <select id="event_id" name="event_id">
-
+                    <option value="">(新しい種目を入力)</option>
                     {% for event in event_list %}
                         <option value="{{ event.event_id }}"
                                 {% if event.event_id == training_set_detail.event_id %}
@@ -29,24 +33,25 @@
                         >{{ event.event_name }}</option>
                     {% endfor %}
                 </select>
-                <label for="event_name"></label><input type="text" id="event_name" name="event_name"/>
+                <label for="event_name"></label><input type="text" id="event_name" name="event_name" disabled required/>
             </div>
+            <small>プルダウンから選択するか新しい種目名を入力してください。</small>
 
             <div>
                 <label for="parts_id">部位</label>
                 <select id="parts_id" name="parts_id">
-
+                    <option value="">(新しい部位を入力)</option>
                     {% for parts in parts_list %}
                         <option value="{{ parts.parts_id }}"
                                 {% if parts.parts_id == training_set_detail.parts_id %}
                                     selected
                                 {% endif %}
-
                         >{{ parts.parts_name }}</option>
                     {% endfor %}
                 </select>
-                <label for="parts_name"></label><input type="text" id="parts_name" name="parts_name"/>
+                <label for="parts_name"></label><input type="text" id="parts_name" name="parts_name" disabled required/>
             </div>
+            <small>プルダウンから選択するか新しい部位名を入力してください。</small>
             <div>
                 <label for="weight">重量</label>
                 <input type="number" id="weight" name="weight" value="{{ training_set_detail.weight }}" required/>

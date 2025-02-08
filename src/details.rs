@@ -19,9 +19,7 @@ async fn training_set_detail(
     context.insert("training_set_detail_list", &rows);
     context.insert("workout_date", &workout_date);
 
-    let rendered = tera
-        .render("detail.tera", &context)
-        .unwrap();
+    let rendered = tera.render("detail.tera", &context).unwrap();
     HttpResponse::Ok().content_type("text/html").body(rendered)
 }
 
@@ -58,16 +56,16 @@ async fn update_training_set(
     let training_set_form = form.into_inner();
     let (workout_date, training_set_id) = path.into_inner();
 
-    let new_event_id = if training_set_form.event_name.is_empty() == false {
-        db::register_training_event(&pool, &training_set_form.event_name).await
+    let new_event_id = if training_set_form.event_name.is_some() {
+        db::register_training_event(&pool, &training_set_form.event_name.unwrap()).await
     } else {
-        training_set_form.event_id.parse::<i32>().unwrap()
+        training_set_form.event_id.unwrap()
     };
 
-    let new_parts_id = if training_set_form.parts_name.is_empty() == false {
-        db::register_training_parts(&pool, &training_set_form.parts_name).await
+    let new_parts_id = if training_set_form.parts_name.is_some() {
+        db::register_training_parts(&pool, &training_set_form.parts_name.unwrap()).await
     } else {
-        training_set_form.parts_id.parse::<i32>().unwrap()
+        training_set_form.parts_id.unwrap()
     };
 
     db::update_training_set(
@@ -81,7 +79,7 @@ async fn update_training_set(
             workout_date: training_set_form.workout_date,
         },
     )
-        .await;
+    .await;
 
     HttpResponse::Found()
         .append_header(("Location", format!("/training_set/{}", workout_date)))

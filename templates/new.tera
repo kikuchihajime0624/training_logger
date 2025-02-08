@@ -1,7 +1,10 @@
 {% extends "base.tera" %}
 
-<title>{% block title %}記録をつける{% endblock %}  </title>
+{% block title %}記録をつける{% endblock %}
 
+{% block script %}
+    <script src="/static/js/training_set_form.js" defer></script>
+{% endblock %}
 
 {% block content %}
 
@@ -10,32 +13,36 @@
     <form action="/new" method="post">
         <div>
             <label for="workout_date">日付</label>
-            <input type="date" id="workout_date" name="workout_date"/>
+            <input type="date" id="workout_date" name="workout_date" required/>
 
         </div>
         <div>
             <label for="event_id">種目</label>
             <select id="event_id" name="event_id">
-                <option value="">種目を選択</option>
+                <option value="">(新しい種目を入力)</option>
                 {% for event in event_list %}
                     <option value="{{ event.event_id }}">{{ event.event_name }}</option>
                 {% endfor %}
             </select>
             <label for="event_name">種目名</label>
-            <input type="text" id="event_name" name="event_name" placeholder="新しい種目はここに入力"/>
+            <input type="text" id="event_name" name="event_name" placeholder="新しい種目はここに入力" required/>
+
         </div>
+        <small>プルダウンから選択するか新しい種目名を入力してください。</small>
 
         <div>
             <label for="parts_id">部位</label>
             <select id="parts_id" name="parts_id">
-                <option value="">部位を選択</option>
+                <option value="">(新しい部位を入力)</option>
                 {% for parts in parts_list %}
                     <option value="{{ parts.parts_id }}">{{ parts.parts_name }}</option>
                 {% endfor %}
             </select>
             <label for="parts_name">部位名</label>
-            <input type="text" id="parts_name" name="parts_name" placeholder="新しい部位はここに入力"/>
+            <input type="text" id="parts_name" name="parts_name" placeholder="新しい部位はここに入力" required/>
         </div>
+        <small>プルダウンから選択するか新しい部位名を入力してください。</small>
+
         <div>
             <label for="weight">重量</label>
             <input type="number" id="weight" name="weight" placeholder="重量を入力" required/>
