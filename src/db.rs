@@ -1,37 +1,37 @@
-use actix_web::web;
 use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, PgPool};
 
-//#[get("/new")]
+
 #[derive(Debug, FromRow, Serialize)]
 pub struct TrainingEvent {
     pub event_id: i32,
     pub event_name: String,
 }
 
-#[derive(Debug, FromRow, Serialize)]
-pub struct TrainingPart {
-    pub parts_id: i32,
-    pub parts_name: String,
-}
-pub async fn rows_events(pool: &PgPool) -> Vec<TrainingEvent> {
+pub async fn get_events(pool: &PgPool) -> Vec<TrainingEvent> {
     sqlx::query_as::<_, TrainingEvent>("SELECT * FROM training_event ORDER BY event_id")
         .fetch_all(pool)
         .await
         .unwrap()
 }
+#[derive(Debug, FromRow, Serialize)]
+pub struct TrainingPart {
+    pub parts_id: i32,
+    pub parts_name: String,
+}
 
-pub async fn rows_parts(pool: &PgPool) -> Vec<TrainingPart> {
+pub async fn get_parts(pool: &PgPool) -> Vec<TrainingPart> {
     sqlx::query_as::<_, TrainingPart>("SELECT * FROM training_parts ORDER BY parts_id")
         .fetch_all(pool)
         .await
         .unwrap()
+
 }
 
-//#[post("/new")]
 
-pub async fn new_workout_event_id(pool: &PgPool, event_name: &String) -> i32 {
+
+pub async fn register_training_event(pool: &PgPool, event_name: &String) -> i32 {
     sqlx::query_scalar(
         "
         INSERT INTO training_event(event_name)
@@ -46,7 +46,7 @@ pub async fn new_workout_event_id(pool: &PgPool, event_name: &String) -> i32 {
     .unwrap()
 }
 
-pub async fn new_workout_parts_id(pool: &PgPool, parts_name: &String) -> i32 {
+pub async fn register_training_parts(pool: &PgPool, parts_name: &String) -> i32 {
     sqlx::query_scalar(
         "
         INSERT INTO training_parts(parts_name)
@@ -72,7 +72,7 @@ pub struct NewTrainingSet {
     pub workout_date: Option<NaiveDate>, // NULLが入るかもしれない時はOptionにする
 }
 
-pub async fn insert_training_set(pool: &PgPool, new_workout: NewTrainingSet) {
+pub async fn register_training_set(pool: &PgPool, new_workout: NewTrainingSet) {
     sqlx::query(
         "INSERT INTO training_set(workout_date, event_id, parts_id,  weight, times)
         VALUES ($1, $2, $3, $4, $5 )",
@@ -87,7 +87,7 @@ pub async fn insert_training_set(pool: &PgPool, new_workout: NewTrainingSet) {
     .unwrap();
 }
 
-//detailのSQL文
+
 
 #[derive(Debug, FromRow, Serialize)]
 pub struct TrainingSetDetail {
@@ -101,7 +101,7 @@ pub struct TrainingSetDetail {
     pub times: i32,
     pub workout_date: Option<NaiveDate>,
 }
-pub async fn get_training_set(pool: &PgPool, workout_date: &NaiveDate) -> Vec<TrainingSetDetail> {
+pub async fn get_training_set_by_workout_date(pool: &PgPool, workout_date: &NaiveDate) -> Vec<TrainingSetDetail> {
     sqlx::query_as::<_, TrainingSetDetail>(
         "SELECT ts.training_set_id, te.event_name, te.event_id, tp.parts_name, tp.parts_id, ts.weight, ts.times, ts.workout_date
             FROM training_set AS ts
@@ -116,7 +116,6 @@ pub async fn get_training_set(pool: &PgPool, workout_date: &NaiveDate) -> Vec<Tr
     .unwrap()
 }
 
-//edit
 pub async fn get_training_set_by_id(pool: &PgPool, training_set_id: i32) -> TrainingSetDetail {
     sqlx::query_as::<_, TrainingSetDetail>(
         "SELECT ts.training_set_id, te.event_name, te.event_id, tp.parts_name, tp.parts_id, ts.weight, ts.times, ts.workout_date
@@ -132,19 +131,6 @@ pub async fn get_training_set_by_id(pool: &PgPool, training_set_id: i32) -> Trai
         .unwrap()
 }
 
-pub async fn update_events(pool: &PgPool) -> Vec<TrainingEvent> {
-    sqlx::query_as::<_, TrainingEvent>("SELECT * FROM training_event ORDER BY event_id")
-        .fetch_all(pool)
-        .await
-        .unwrap()
-}
-
-pub async fn update_parts(pool: &PgPool) -> Vec<TrainingPart> {
-    sqlx::query_as::<_, TrainingPart>("SELECT * FROM training_parts ORDER BY parts_id")
-        .fetch_all(pool)
-        .await
-        .unwrap()
-}
 pub async fn update_training_set(pool: &PgPool, update_workout: TrainingSetDetail) {
     sqlx::query(
         "UPDATE training_set

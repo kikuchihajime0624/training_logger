@@ -19,8 +19,8 @@ struct TrainingSet {
 
 #[get("/new")]
 async fn new_log_events(tera: web::Data<Tera>, pool: web::Data<PgPool>) -> HttpResponse {
-    let rows_event = db::rows_events(&pool).await;
-    let rows_parts = db::rows_parts(&pool).await;
+    let rows_event = db::get_events(&pool).await;
+    let rows_parts = db::get_parts(&pool).await;
 
     let mut context = Context::new();
     context.insert("event_list", &rows_event);
@@ -46,18 +46,18 @@ async fn new_training_set(pool: web::Data<PgPool>, form: web::Form<WorkoutForm>)
     let workout_form = form.into_inner();
 
     let new_event_id = if workout_form.event_name.is_empty() == false {
-        db::new_workout_event_id(&pool, &workout_form.event_name).await
+        db::register_training_event(&pool, &workout_form.event_name).await
     } else {
         workout_form.event_id.parse::<i32>().unwrap()
     };
 
     let new_parts_id = if workout_form.parts_name.is_empty() == false {
-        db::new_workout_parts_id(&pool, &workout_form.parts_name).await
+        db::register_training_parts(&pool, &workout_form.parts_name).await
     } else {
         workout_form.parts_id.parse::<i32>().unwrap()
     };
 
-    db::insert_training_set(
+    db::register_training_set(
         &pool,
         db::NewTrainingSet {
             event_id: new_event_id,

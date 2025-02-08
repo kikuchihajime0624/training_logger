@@ -13,7 +13,7 @@ async fn training_set_detail(
 ) -> HttpResponse {
     let workout_date = workout_date.into_inner();
 
-    let rows = db::get_training_set(&pool, &workout_date).await;
+    let rows = db::get_training_set_by_workout_date(&pool, &workout_date).await;
 
     let mut context = Context::new();
     context.insert("training_set_detail_list", &rows);
@@ -34,8 +34,8 @@ async fn training_set_edit(
 ) -> HttpResponse {
     let (workout_date, training_set_id) = path.into_inner();
 
-    let rows_event = db::rows_events(&pool).await;
-    let rows_parts = db::rows_parts(&pool).await;
+    let rows_event = db::get_events(&pool).await;
+    let rows_parts = db::get_parts(&pool).await;
 
     let rows = db::get_training_set_by_id(&pool, training_set_id).await;
 
@@ -59,13 +59,13 @@ async fn update_training_set(
     let (workout_date, training_set_id) = path.into_inner();
 
     let new_event_id = if workout_form.event_name.is_empty() == false {
-        db::new_workout_event_id(&pool, &workout_form.event_name).await
+        db::register_training_event(&pool, &workout_form.event_name).await
     } else {
         workout_form.event_id.parse::<i32>().unwrap()
     };
 
     let new_parts_id = if workout_form.parts_name.is_empty() == false {
-        db::new_workout_parts_id(&pool, &workout_form.parts_name).await
+        db::register_training_parts(&pool, &workout_form.parts_name).await
     } else {
         workout_form.parts_id.parse::<i32>().unwrap()
     };
