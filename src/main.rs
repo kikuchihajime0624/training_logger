@@ -3,7 +3,6 @@ mod details;
 mod new;
 
 use actix_web::{get, web, App, HttpResponse, HttpServer};
-use chrono::NaiveDate;
 use dotenvy::dotenv;
 
 use sqlx::PgPool;
@@ -12,12 +11,7 @@ use tera::{Context, Tera};
 
 #[get("/")]
 async fn index(tera: web::Data<Tera>, pool: web::Data<PgPool>) -> HttpResponse {
-    let rows = sqlx::query_scalar::<_, NaiveDate>(
-        "SELECT DISTINCT workout_date FROM training_set ORDER BY workout_date DESC",
-    )
-    .fetch_all(pool.as_ref())
-    .await
-    .unwrap();
+    let rows = db::get_workout_data_list(&pool).await;
 
     let mut context = Context::new();
     context.insert("workout_date_list", &rows);

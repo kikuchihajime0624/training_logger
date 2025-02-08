@@ -2,6 +2,16 @@ use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, PgPool};
 
+pub async fn get_workout_data_list(pool: &PgPool) -> Vec<NaiveDate> {
+    sqlx::query_scalar::<_, NaiveDate>(
+        "SELECT DISTINCT workout_date FROM training_set ORDER BY workout_date DESC",
+    )
+    .fetch_all(pool)
+    .await
+    .unwrap()
+}
+
+
 #[derive(Debug, FromRow, Serialize)]
 pub struct TrainingEvent {
     pub event_id: i32,
@@ -125,7 +135,6 @@ pub async fn get_training_set_by_id(pool: &PgPool, training_set_id: i32) -> Trai
         .await
         .unwrap()
 }
-
 
 #[derive(Debug, Deserialize)]
 pub struct TrainingSet {
