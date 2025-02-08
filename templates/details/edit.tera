@@ -8,13 +8,13 @@
 
     <h1>記録をつける</h1>
 
-    <form action="/training_set/{{ workout_date }}/edit" method="post">
-        {% for training_set_detail in training_set_detail_list %}
+<form action="/training_set/{{ workout_date }}/edit/{{  training_set_detail.training_set_id }}" method="post">
+
             <div>
                 <div>
                     <label for="workout_date">日付</label>
                     <input type="date" id="workout_date" name="workout_date"
-                           value="{{ training_set_detail.event_name }}"/>
+                           value="{{ workout_date }}"/>
 
                 </div>
                 <div>
@@ -57,10 +57,10 @@
                     <input type="number" id="times" name="times" value="{{ training_set_detail.times }}" required/>
                 </div>
             </div>
-        {% endfor %}
+
 
         <div>
-            <input type="submit" value="変更"/>
+            <button type="submit" >変更</button>
         </div>
     </form>
 {% endblock %}

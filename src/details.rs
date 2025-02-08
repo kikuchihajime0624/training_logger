@@ -1,9 +1,9 @@
 use crate::db;
+use crate::new::WorkoutForm;
 use actix_web::{get, post, web, HttpResponse};
 use chrono::NaiveDate;
 use sqlx::PgPool;
 use tera::{Context, Tera};
-use crate::new::WorkoutForm;
 
 #[get("/training_set/{workout_date}")]
 async fn training_set_detail(
@@ -11,62 +11,52 @@ async fn training_set_detail(
     tera: web::Data<Tera>,
     pool: web::Data<PgPool>,
 ) -> HttpResponse {
-    let  context = Context::new();
-    get_training_detail(
-        workout_date.into_inner(),
-        &tera,
-        &pool,
-        "details/training_set_detail.tera",
-        context,
-    )
-        .await
+    let workout_date = workout_date.into_inner();
+
+    let rows = db::get_training_set(&pool, &workout_date).await;
+
+    let mut context = Context::new();
+    context.insert("training_set_detail_list", &rows);
+    context.insert("workout_date", &workout_date);
+
+    let rendered = tera
+        .render("details/training_set_detail.tera", &context)
+        .unwrap();
+    HttpResponse::Ok().content_type("text/html").body(rendered)
 }
 
 // edit
-#[get("/training_set/{workout_date}/edit")]
+#[get("/training_set/{workout_date}/edit/{training_set_id}")]
 async fn training_set_edit(
-    workout_date: web::Path<NaiveDate>,
+    path: web::Path<(NaiveDate, i32)>,
     tera: web::Data<Tera>,
     pool: web::Data<PgPool>,
 ) -> HttpResponse {
+    let (workout_date, training_set_id) = path.into_inner();
 
     let rows_event = db::rows_events(&pool).await;
     let rows_parts = db::rows_parts(&pool).await;
 
-    let  mut context = Context::new();
+    let rows = db::get_training_set_by_id(&pool, training_set_id).await;
+
+    let mut context = Context::new();
     context.insert("event_list", &rows_event);
     context.insert("parts_list", &rows_parts);
+    context.insert("training_set_detail", &rows);
+    context.insert("workout_date", &workout_date);
 
-    get_training_detail(
-        workout_date.into_inner(),
-        &tera,
-        &pool,
-        "details/edit.tera",
-        context,
-    )
-    .await
-}
-
-async fn get_training_detail(
-    workout_date_get: NaiveDate,
-    tera: &Tera,
-    pool: &PgPool,
-    template: &str,
-    mut context: Context,
-) -> HttpResponse {
-    let rows = db::get_training_set(&pool, &workout_date_get).await;
-
-
-    context.insert("training_set_detail_list", &rows);
-    context.insert("workout_date", &workout_date_get);
-
-    let rendered = tera.render(template, &context).unwrap();
+    let rendered = tera.render("details/edit.tera", &context).unwrap();
     HttpResponse::Ok().content_type("text/html").body(rendered)
 }
 
 
-#[post("/training_set/{workout_date}/edit")]
-async fn training_set_update(pool: web::Data<PgPool>, form: web::Form<WorkoutForm>) -> HttpResponse {
+
+
+#[post("/training_set/{workout_date}/edit/{training_set_id}")]
+async fn update_training_set(
+    pool: web::Data<PgPool>,
+    form: web::Form<WorkoutForm>,
+) -> HttpResponse {
     let workout_form = form.into_inner();
 
     let new_event_id = if workout_form.event_name.is_empty() == false {
@@ -81,9 +71,10 @@ async fn training_set_update(pool: web::Data<PgPool>, form: web::Form<WorkoutFor
         workout_form.parts_id.parse::<i32>().unwrap()
     };
 
-    db::insert_training_set(
+    db::update_training_set(
         &pool,
-        db::NewWorkout {
+        db::TrainingSetDetail {
+            training_set_id: 0,
             event_id: new_event_id,
             event_name: workout_form.event_name,
             parts_id: new_parts_id,
@@ -93,7 +84,7 @@ async fn training_set_update(pool: web::Data<PgPool>, form: web::Form<WorkoutFor
             workout_date: workout_form.workout_date,
         },
     )
-        .await;
+    .await;
 
     HttpResponse::Found()
         .append_header(("Location", "/"))
