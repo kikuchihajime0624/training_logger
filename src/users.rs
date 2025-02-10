@@ -1,6 +1,6 @@
 use crate::users_db;
 use actix_web::{get, post, web, HttpResponse};
-use bcrypt::{hash, DEFAULT_COST};
+use bcrypt::{hash, verify, DEFAULT_COST};
 use serde::Deserialize;
 use sqlx::PgPool;
 use tera::{Context, Tera};
@@ -26,13 +26,24 @@ async fn post_login(
 ) -> HttpResponse {
     let form = form.into_inner();
 
-    let username = users_db::get_user_by_username(&pool, form.username).await;
+    let user = users_db::get_user_by_username(&pool, form.username).await;
 
     let mut context = Context::new();
-    context.insert("username", &username);
+    context.insert("message", "ユーザーIDまたはパスワードが違います");
 
     let rendered = tera.render("login.tera", &context).unwrap();
-    HttpResponse::Ok().content_type("text/html").body(rendered)
+
+    if user.is_none() {
+        return HttpResponse::Ok().content_type("text/html").body(rendered);
+    }
+
+    if verify(&form.password, &user.unwrap().password).unwrap() == false {
+        return HttpResponse::Ok().content_type("text/html").body(rendered);
+    }
+
+    HttpResponse::Found()
+        .append_header(("Location", "/"))
+        .finish()
 }
 
 #[derive(Debug, Deserialize)]
@@ -46,8 +57,6 @@ async fn get_signup(tera: web::Data<Tera>) -> HttpResponse {
     let mut context = Context::new();
     context.insert("username", "");
 
-
-
     let rendered = tera.render("signup.tera", &context).unwrap();
     HttpResponse::Ok().content_type("text/html").body(rendered)
 }
@@ -58,25 +67,36 @@ async fn post_signup(
     pool: web::Data<PgPool>,
     form: web::Form<SignupForm>,
 ) -> HttpResponse {
+    let form = form.into_inner();
+
+    let mut context = Context::new();
+    context.insert("username", &form.username);
 
     if form.password != form.confirm_password {
-        let mut context = Context::new();
-        context.insert("username", &form.username);
         context.insert("message", "パスワードが一致しません");
-
 
         let rendered = tera.render("signup.tera", &context).unwrap();
         return HttpResponse::Ok().content_type("text/html").body(rendered);
     }
+
+    let user = users_db::get_user_by_username(&pool, form.username.clone()).await;
+    if user.is_some() {
+        context.insert("message", "そのユーザーは既に存在します");
+
+        let rendered = tera.render("signup.tera", &context).unwrap();
+        return HttpResponse::Ok().content_type("text/html").body(rendered);
+    }
+
     let password = hash(&form.password, DEFAULT_COST).unwrap();
 
     users_db::register_user(
         &pool,
-        users_db::User{
+        users_db::User {
             username: form.username.clone(),
             password,
-        }
-    ).await;
+        },
+    )
+    .await;
 
     HttpResponse::Found()
         .append_header(("Location", "/"))

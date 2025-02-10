@@ -4,15 +4,24 @@
     {% block title %} login {% endblock %}
 
 {% block content %}
-    <form action="/login" method="post">
+
+    {% if message %}
         <div>
-            ユーザー名
+            {{ message }}
+
+        </div>
+    {% endif %}
+
+    <form action="/login" method="post">
+
+        <div>
+            <label for="username">ユーザー名</label>
             <input type="text" id="username" name="username" placeholder="ユーザー名" required/>
         </div>
 
         <div>
-            パスワード
-            <input type="text" id="password" name="password" placeholder="パスワード" required/>
+            <label for="password">パスワード</label>
+            <input type="password" id="password" name="password" placeholder="パスワード" required/>
         </div>
 
         <div>
