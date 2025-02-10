@@ -5,7 +5,7 @@ use sqlx::{FromRow, PgPool};
 #[derive(Debug, FromRow, Serialize)]
 pub struct TrainingSummary {
     pub workout_date: NaiveDate,
-    pub total_weight: i64,
+    pub total_weight: f64,
 }
 pub async fn get_training_summary_list(
     pool: &PgPool,
@@ -93,7 +93,7 @@ pub async fn register_training_parts(pool: &PgPool, parts_name: &String) -> i32 
 pub struct NewTrainingSet {
     pub event_id: i32,
     pub parts_id: i32,
-    pub weight: i32,
+    pub weight: f32,
     pub times: i32,
     pub workout_date: NaiveDate,
 }
@@ -120,7 +120,7 @@ pub struct TrainingSetDetail {
     pub event_id: i32,
     pub parts_name: String,
     pub parts_id: i32,
-    pub weight: i32,
+    pub weight: f32,
     pub times: i32,
     pub workout_date: NaiveDate,
 }
@@ -162,7 +162,7 @@ pub struct TrainingSet {
     pub training_set_id: i32,
     pub event_id: i32,
     pub parts_id: i32,
-    pub weight: i32,
+    pub weight: f32,
     pub times: i32,
     pub workout_date: NaiveDate,
 }

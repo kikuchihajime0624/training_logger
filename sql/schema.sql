@@ -24,7 +24,7 @@ CREATE TABLE training_set
     training_set_id SERIAL NOT NULL,
     event_id        INT REFERENCES training_event (event_id),
     parts_id        INT REFERENCES training_parts (parts_id),
-    weight          INT    NOT NULL,
+    weight          REAL    NOT NULL,
     times           INT    NOT NULL,
     workout_date    DATE   NOT NULL,
     username        varchar(32) REFERENCES users (username),

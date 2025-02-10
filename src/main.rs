@@ -1,6 +1,8 @@
-mod db;
+mod training_set_db;
 mod details;
 mod new;
+mod users;
+mod users_db;
 
 use actix_web::{get, web, App, HttpResponse, HttpServer};
 use chrono::{Datelike, Local};
@@ -28,9 +30,9 @@ async fn index(
     let selected_year = query.selected_year.unwrap_or(Local::now().year());
     let selected_month = query.selected_month.unwrap_or(Local::now().month()) as i32;
 
-    let rows = db::get_training_summary_list(&pool, selected_year, selected_month).await;
+    let rows = training_set_db::get_training_summary_list(&pool, selected_year, selected_month).await;
 
-    let oldest_year = db::get_oldest_year(&pool)
+    let oldest_year = training_set_db::get_oldest_year(&pool)
         .await
         .map(|workout_date| workout_date.year()).unwrap_or(current_year);
 

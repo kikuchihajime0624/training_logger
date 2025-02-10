@@ -1,4 +1,4 @@
-use crate::db;
+use crate::training_set_db;
 use actix_web::{get, post, web, HttpResponse};
 use chrono::NaiveDate;
 use serde::{Deserialize, Serialize};
@@ -10,15 +10,15 @@ struct TrainingSet {
     training_set_id: i32,
     event_id: i32,
     parts_id: i32,
-    weight: i32,
+    weight: f32,
     times: i32,
     workout_date: NaiveDate,
 }
 
 #[get("/new")]
 async fn new_log_events(tera: web::Data<Tera>, pool: web::Data<PgPool>) -> HttpResponse {
-    let rows_event = db::get_events(&pool).await;
-    let rows_parts = db::get_parts(&pool).await;
+    let rows_event = training_set_db::get_events(&pool).await;
+    let rows_parts = training_set_db::get_parts(&pool).await;
 
     let mut context = Context::new();
     context.insert("event_list", &rows_event);
@@ -35,7 +35,7 @@ pub struct TrainingSetForm {
     pub(crate) event_name: Option<String>,
     pub(crate) parts_id: Option<i32>,
     pub(crate) parts_name: Option<String>,
-    pub(crate) weight: i32,
+    pub(crate) weight: f32,
     pub(crate) times: i32,
     pub(crate) workout_date: NaiveDate,
 }
@@ -47,20 +47,20 @@ async fn new_training_set(
     let training_set_form = form.into_inner();
 
     let new_event_id = if training_set_form.event_name.is_some()  {
-        db::register_training_event(&pool, &training_set_form.event_name.unwrap()).await
+        training_set_db::register_training_event(&pool, &training_set_form.event_name.unwrap()).await
     } else {
         training_set_form.event_id.unwrap()
     };
 
     let new_parts_id = if training_set_form.parts_name.is_some() {
-        db::register_training_parts(&pool, &training_set_form.parts_name.unwrap()).await
+        training_set_db::register_training_parts(&pool, &training_set_form.parts_name.unwrap()).await
     } else {
         training_set_form.parts_id.unwrap()
     };
 
-    db::register_training_set(
+    training_set_db::register_training_set(
         &pool,
-        db::NewTrainingSet {
+        training_set_db::NewTrainingSet {
             event_id: new_event_id,
             parts_id: new_parts_id,
             weight: training_set_form.weight,
@@ -77,3 +77,5 @@ async fn new_training_set(
         ))
         .finish()
 }
+
+

@@ -1,4 +1,4 @@
-use crate::db;
+use crate::training_set_db;
 use crate::new::TrainingSetForm;
 use actix_web::{get, post, web, HttpResponse};
 use chrono::NaiveDate;
@@ -13,7 +13,7 @@ async fn training_set_detail(
 ) -> HttpResponse {
     let workout_date = workout_date.into_inner();
 
-    let rows = db::get_training_set_by_workout_date(&pool, &workout_date).await;
+    let rows = training_set_db::get_training_set_by_workout_date(&pool, &workout_date).await;
 
     let mut context = Context::new();
     context.insert("training_set_detail_list", &rows);
@@ -32,10 +32,10 @@ async fn training_set_edit(
 ) -> HttpResponse {
     let (workout_date, training_set_id) = path.into_inner();
 
-    let rows_event = db::get_events(&pool).await;
-    let rows_parts = db::get_parts(&pool).await;
+    let rows_event = training_set_db::get_events(&pool).await;
+    let rows_parts = training_set_db::get_parts(&pool).await;
 
-    let rows = db::get_training_set_by_id(&pool, training_set_id).await;
+    let rows = training_set_db::get_training_set_by_id(&pool, training_set_id).await;
 
     let mut context = Context::new();
     context.insert("event_list", &rows_event);
@@ -57,20 +57,20 @@ async fn update_training_set(
     let (workout_date, training_set_id) = path.into_inner();
 
     let new_event_id = if training_set_form.event_name.is_some() {
-        db::register_training_event(&pool, &training_set_form.event_name.unwrap()).await
+        training_set_db::register_training_event(&pool, &training_set_form.event_name.unwrap()).await
     } else {
         training_set_form.event_id.unwrap()
     };
 
     let new_parts_id = if training_set_form.parts_name.is_some() {
-        db::register_training_parts(&pool, &training_set_form.parts_name.unwrap()).await
+        training_set_db::register_training_parts(&pool, &training_set_form.parts_name.unwrap()).await
     } else {
         training_set_form.parts_id.unwrap()
     };
 
-    db::update_training_set(
+    training_set_db::update_training_set(
         &pool,
-        db::TrainingSet {
+        training_set_db::TrainingSet {
             training_set_id,
             event_id: new_event_id,
             parts_id: new_parts_id,
@@ -93,7 +93,7 @@ async fn delete_training_set(
 ) -> HttpResponse {
     let (workout_date, training_set_id) = path.into_inner();
 
-    db::delete_training_set(&pool, training_set_id).await;
+    training_set_db::delete_training_set(&pool, training_set_id).await;
 
     HttpResponse::Found()
         .append_header(("Location", format!("/training_set/{}", workout_date)))
