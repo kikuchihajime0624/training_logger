@@ -1,5 +1,6 @@
 use crate::users_db;
 use actix_web::{get, post, web, HttpResponse};
+use bcrypt::{hash, DEFAULT_COST};
 use serde::Deserialize;
 use sqlx::PgPool;
 use tera::{Context, Tera};
@@ -67,6 +68,15 @@ async fn post_signup(
         let rendered = tera.render("signup.tera", &context).unwrap();
         return HttpResponse::Ok().content_type("text/html").body(rendered);
     }
+    let password = hash(&form.password, DEFAULT_COST).unwrap();
+
+    users_db::register_user(
+        &pool,
+        users_db::User{
+            username: form.username.clone(),
+            password,
+        }
+    ).await;
 
     HttpResponse::Found()
         .append_header(("Location", "/"))
