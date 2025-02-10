@@ -16,7 +16,7 @@ struct TrainingSet {
 }
 
 #[get("/new")]
-async fn new_log_events(tera: web::Data<Tera>, pool: web::Data<PgPool>) -> HttpResponse {
+async fn get_new_training_set(tera: web::Data<Tera>, pool: web::Data<PgPool>) -> HttpResponse {
     let rows_event = training_set_db::get_events(&pool).await;
     let rows_parts = training_set_db::get_parts(&pool).await;
 
@@ -40,7 +40,7 @@ pub struct TrainingSetForm {
     pub(crate) workout_date: NaiveDate,
 }
 #[post("/new")]
-async fn new_training_set(
+async fn post_new_training_set(
     pool: web::Data<PgPool>,
     form: web::Form<TrainingSetForm>,
 ) -> HttpResponse {

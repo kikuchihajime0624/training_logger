@@ -4,16 +4,21 @@
     {% block title %} login {% endblock %}
 
 {% block content %}
-    <div>
-        <input type="text" id="username" name="username" placeholder="ユーザー名" required/>
-    </div>
+    <form action="/login" method="post">
+        <div>
+            ユーザー名
+            <input type="text" id="username" name="username" placeholder="ユーザー名" required/>
+        </div>
 
-    <div>
-        <input type="text" id="password" name="password" placeholder="パスワード" required/>
-    </div>
+        <div>
+            パスワード
+            <input type="text" id="password" name="password" placeholder="パスワード" required/>
+        </div>
 
-    <div>
-        <button type="submit">ログイン</button>
-    </div>
+        <div>
+            <button type="submit">ログイン</button>
+        </div>
+
+    </form>
 
 {% endblock %}

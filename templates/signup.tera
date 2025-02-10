@@ -1,0 +1,41 @@
+{% extends "base.tera" %}
+
+
+    {% block title %} register {% endblock %}
+
+{% block content %}
+    <form action="/signup" method="post">
+        {% if message %}
+        <div>
+            {{ message }}
+
+        </div>
+        {% endif %}
+
+
+        <div>
+            <label for="username">ユーザー名</label>
+            <input type="text" value="{{ username }}" id="username" name="username" maxlength="32" required>
+            <small>32字以内</small>
+        </div>
+
+
+        <div>
+            <label for="password">パスワード</label>
+            <input type="password" id="password" name="password" maxlength="32" required>
+            <small>32字以内</small>
+        </div>
+
+        <div>
+            <label for="confirm_password">パスワードの確認</label>
+            <input type="password" id="confirm_password" name="confirm_password" maxlength="32" required>
+            <small>32字以内</small>
+
+        </div>
+
+        <button>登録</button>
+    </form>
+
+
+{% endblock %}
+
