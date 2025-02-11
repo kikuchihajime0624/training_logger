@@ -32,14 +32,16 @@ async fn index(
     user: Option<Identity>,
 ) -> HttpResponse {
     let current_year = Local::now().year();
+    let username = user.unwrap().id().unwrap();
 
     let selected_year = query.selected_year.unwrap_or(Local::now().year());
     let selected_month = query.selected_month.unwrap_or(Local::now().month()) as i32;
 
     let rows =
-        training_set_db::get_training_summary_list(&pool, selected_year, selected_month).await;
+        training_set_db::get_training_summary_list(&pool, selected_year, selected_month, username.clone())
+            .await;
 
-    let oldest_year = training_set_db::get_oldest_year(&pool)
+    let oldest_year = training_set_db::get_oldest_year(&pool, username.clone())
         .await
         .map(|workout_date| workout_date.year())
         .unwrap_or(current_year);

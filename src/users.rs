@@ -14,7 +14,7 @@ struct LoginForm {
 
 #[get("/login")]
 async fn get_login(tera: web::Data<Tera>) -> HttpResponse {
-    let mut context = Context::new();
+    let  context = Context::new();
 
     let rendered = tera.render("login.tera", &context).unwrap();
     HttpResponse::Ok().content_type("text/html").body(rendered)
