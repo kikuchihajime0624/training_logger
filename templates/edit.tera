@@ -1,7 +1,7 @@
 {% extends "base.tera" %}
 
     {% block title %}
-        編集 | {{ workout_date }}
+        編集 | {{ workout_date | date(format="%Y/%m/%d") }}
     {% endblock %}
 
 {% block script %}
@@ -56,9 +56,11 @@
             <small>プルダウンから選択するか新しい部位名を入力してください。</small>
             <div>
                 <label for="weight">重量</label>
-                <input type="number" id="weight" name="weight" value="{{ training_set_detail.weight }}" step="0.1"
-                       min="0.1" max="999.9" required/>
-
+                <div class="input-group">
+                    <input type="number" id="weight" name="weight" value="{{ training_set_detail.weight }}" step="0.1"
+                           min="0.1" max="999.9" required/>
+                    <span class="input-group-text"> kg </span>
+                </div>
             </div>
             <div>
                 <label for="times">回数</label>

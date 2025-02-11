@@ -2397,6 +2397,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "tera_thousands"
+version = "0.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1087c29fa0b4b12ccd41617704e3f89237616185ce11359b433af67fd04ff332"
+dependencies = [
+ "tera",
+ "thousands",
+]
+
+[[package]]
 name = "thiserror"
 version = "2.0.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2415,6 +2425,12 @@ dependencies = [
  "quote",
  "syn",
 ]
+
+[[package]]
+name = "thousands"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3bf63baf9f5039dadc247375c29eb13706706cfde997d0330d05aa63a77d8820"
 
 [[package]]
 name = "time"
@@ -2559,6 +2575,7 @@ dependencies = [
  "serde",
  "sqlx",
  "tera",
+ "tera_thousands",
 ]
 
 [[package]]

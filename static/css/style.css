@@ -1,8 +1,11 @@
 nav {
     background-color: indigo;
-
 }
 
 .max_width {
     max-width: 500px;
+}
+
+.month_year {
+    max-width: 400px;
 }

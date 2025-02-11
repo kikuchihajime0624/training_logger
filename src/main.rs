@@ -103,6 +103,7 @@ async fn main() -> std::io::Result<()> {
     HttpServer::new(move || {
         let mut templates = Tera::new("templates/**/*").expect("error in tera/templates");
         templates.autoescape_on(vec!["tera"]);
+        templates.register_filter("separate_with_commas", tera_thousands::separate_with_commas);
         App::new()
             .wrap(IdentityMiddleware::default())
             .wrap(

@@ -1,44 +1,49 @@
 {% extends "base.tera" %}
 
     {% block title %}
-        詳細 | {{ workout_date }}
+        詳細 | {{ workout_date | date(format="%Y/%m/%d") }}
     {% endblock %}
 
 {% block content %}
 
 
-    <h1>Detail</h1>
-{{ workout_date }}の総重量    {{ sum_daily }} kg
+    <h1>{{ workout_date | date(format="%Y/%m/%d") }}</h1>
+   総重量    {{ sum_daily | separate_with_commas }} kg
+
+    <table class="table my-3">
+        <thead>
+        <tr>
+            <th>種目</th>
+            <th>部位</th>
+            <th>重量</th>
+            <th>回数</th>
+            <th></th>
+            <th></th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for training_set_detail in training_set_detail_list %}
+
+            <tr>
+                <td>{{ training_set_detail.event_name }}</td>
+                <td>{{ training_set_detail.parts_name }} </td>
+                <td>{{ training_set_detail.weight }} kg</td>
+                <td>{{ training_set_detail.times }} </td>
 
 
-    {% for training_set_detail in training_set_detail_list %}
-        <div>
-            <dl>
-
-
-                <dt>種目</dt>
-                <dd>{{ training_set_detail.event_name }}</dd>
-
-                <dt>部位</dt>
-                <dd>{{ training_set_detail.parts_name }} </dd>
-
-                <dt>重量</dt>
-                <dd>{{ training_set_detail.weight }} </dd>
-
-                <dt>回数</dt>
-                <dd>{{ training_set_detail.times }} </dd>
-            </dl>
-
-            <div>
-                <a href="/training_set/{{ workout_date }}/edit/{{ training_set_detail.training_set_id }}">編集する</a>
-
-                <form action="/training_set/{{ workout_date }}/delete/{{ training_set_detail.training_set_id }}"
-                      method="post">
-                    <button>削除する</button>
-                </form>
-            </div>
-        </div>
-    {% endfor %}
-
+                <td>
+                    <a href="/training_set/{{ workout_date }}/edit/{{ training_set_detail.training_set_id }}"
+                       class="btn btn-light border ">編集する</a>
+                </td>
+                <td>
+                    <form action="/training_set/{{ workout_date }}/delete/{{ training_set_detail.training_set_id }}"
+                          method="post">
+                        <button class="btn btn-light ">削除する</button>
+                    </form>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}
 
