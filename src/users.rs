@@ -46,8 +46,19 @@ async fn post_login(
     Identity::login(&request.extensions(), form.username).unwrap();
 
     HttpResponse::Found()
-        .append_header(("Location", "/"))
+        .append_header(("Location", "/training_set"))
         .finish()
+}
+
+#[post("/logout")]
+async fn logout( user: Option<Identity>) -> HttpResponse {
+
+    user.unwrap().logout();
+
+    HttpResponse::Found()
+        .append_header(("Location", "/login"))
+        .finish()
+
 }
 
 #[derive(Debug, Deserialize)]
@@ -103,7 +114,7 @@ async fn post_signup(
     .await;
 
     HttpResponse::Found()
-        .append_header(("Location", "/"))
+        .append_header(("Location", "/login"))
         .finish()
 }
 

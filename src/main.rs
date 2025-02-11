@@ -18,14 +18,27 @@ use std::env;
 
 use tera::{Context, Tera};
 
+#[get("/")]
+async fn index(user: Option<Identity>) -> HttpResponse {
+    if user.is_some() {
+        HttpResponse::Found()
+            .append_header(("Location", "/training_set"))
+            .finish()
+    } else {
+        HttpResponse::Found()
+            .append_header(("Location", "/login"))
+            .finish()
+    }
+}
+
 #[derive(Debug, Deserialize)]
 struct SelectYearMonth {
     selected_year: Option<i32>,
     selected_month: Option<u32>,
 }
 
-#[get("/")]
-async fn index(
+#[get("/training_set")]
+async fn get_workout_date(
     tera: web::Data<Tera>,
     pool: web::Data<PgPool>,
     query: web::Query<SelectYearMonth>,
@@ -37,9 +50,13 @@ async fn index(
     let selected_year = query.selected_year.unwrap_or(Local::now().year());
     let selected_month = query.selected_month.unwrap_or(Local::now().month()) as i32;
 
-    let rows =
-        training_set_db::get_training_summary_list(&pool, selected_year, selected_month, username.clone())
-            .await;
+    let rows = training_set_db::get_training_summary_list(
+        &pool,
+        selected_year,
+        selected_month,
+        username.clone(),
+    )
+    .await;
 
     let oldest_year = training_set_db::get_oldest_year(&pool, username.clone())
         .await
@@ -84,6 +101,7 @@ async fn main() -> std::io::Result<()> {
                     .build(),
             )
             .service(index)
+            .service(get_workout_date)
             .service(new::get_new_training_set)
             .service(new::post_new_training_set)
             .service(details::training_set_detail)
@@ -94,6 +112,7 @@ async fn main() -> std::io::Result<()> {
             .service(users::post_login)
             .service(users::get_signup)
             .service(users::post_signup)
+            .service(users::logout)
             .service(Files::new("/static", "./static"))
             .app_data(web::Data::new(templates))
             .app_data(web::Data::new(pool.clone()))
