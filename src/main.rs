@@ -1,16 +1,21 @@
-mod training_set_db;
 mod details;
 mod new;
+mod training_set_db;
 mod users;
 mod users_db;
 
+use actix_files::Files;
+use actix_identity::{Identity, IdentityMiddleware};
+use actix_session::storage::CookieSessionStore;
+use actix_session::SessionMiddleware;
+use actix_web::cookie::Key;
 use actix_web::{get, web, App, HttpResponse, HttpServer};
 use chrono::{Datelike, Local};
 use dotenvy::dotenv;
 use serde::Deserialize;
 use sqlx::PgPool;
 use std::env;
-use actix_files::Files;
+
 use tera::{Context, Tera};
 
 #[derive(Debug, Deserialize)]
@@ -24,17 +29,20 @@ async fn index(
     tera: web::Data<Tera>,
     pool: web::Data<PgPool>,
     query: web::Query<SelectYearMonth>,
+    user: Option<Identity>,
 ) -> HttpResponse {
     let current_year = Local::now().year();
 
     let selected_year = query.selected_year.unwrap_or(Local::now().year());
     let selected_month = query.selected_month.unwrap_or(Local::now().month()) as i32;
 
-    let rows = training_set_db::get_training_summary_list(&pool, selected_year, selected_month).await;
+    let rows =
+        training_set_db::get_training_summary_list(&pool, selected_year, selected_month).await;
 
     let oldest_year = training_set_db::get_oldest_year(&pool)
         .await
-        .map(|workout_date| workout_date.year()).unwrap_or(current_year);
+        .map(|workout_date| workout_date.year())
+        .unwrap_or(current_year);
 
     let mut context = Context::new();
     context.insert("training_summary_list", &rows);
@@ -61,10 +69,18 @@ async fn main() -> std::io::Result<()> {
         .parse::<u16>()
         .expect("環境変数にPORTの形式が不正です");
 
+    let secret_key = Key::generate();
+
     HttpServer::new(move || {
         let mut templates = Tera::new("templates/**/*").expect("error in tera/templates");
         templates.autoescape_on(vec!["tera"]);
         App::new()
+            .wrap(IdentityMiddleware::default())
+            .wrap(
+                SessionMiddleware::builder(CookieSessionStore::default(), secret_key.clone())
+                    .cookie_secure(false)
+                    .build(),
+            )
             .service(index)
             .service(new::get_new_training_set)
             .service(new::post_new_training_set)
@@ -79,9 +95,8 @@ async fn main() -> std::io::Result<()> {
             .service(Files::new("/static", "./static"))
             .app_data(web::Data::new(templates))
             .app_data(web::Data::new(pool.clone()))
-
     })
-        .bind(("0.0.0.0", port))?
-        .run()
-        .await
+    .bind(("0.0.0.0", port))?
+    .run()
+    .await
 }

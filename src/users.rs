@@ -1,5 +1,6 @@
+use actix_identity::Identity;
 use crate::users_db;
-use actix_web::{get, post, web, HttpResponse};
+use actix_web::{get, post, web, HttpMessage, HttpRequest, HttpResponse};
 use bcrypt::{hash, verify, DEFAULT_COST};
 use serde::Deserialize;
 use sqlx::PgPool;
@@ -23,10 +24,11 @@ async fn post_login(
     tera: web::Data<Tera>,
     pool: web::Data<PgPool>,
     form: web::Form<LoginForm>,
+    request: HttpRequest,
 ) -> HttpResponse {
     let form = form.into_inner();
 
-    let user = users_db::get_user_by_username(&pool, form.username).await;
+    let user = users_db::get_user_by_username(&pool, form.username.clone()).await;
 
     let mut context = Context::new();
     context.insert("message", "ユーザーIDまたはパスワードが違います");
@@ -40,6 +42,8 @@ async fn post_login(
     if verify(&form.password, &user.unwrap().password).unwrap() == false {
         return HttpResponse::Ok().content_type("text/html").body(rendered);
     }
+
+    Identity::login(&request.extensions(), form.username).unwrap();
 
     HttpResponse::Found()
         .append_header(("Location", "/"))
@@ -102,3 +106,4 @@ async fn post_signup(
         .append_header(("Location", "/"))
         .finish()
 }
+
