@@ -1,4 +1,4 @@
-use crate::training_set_db;
+use crate::{response_util, training_set_db};
 use actix_identity::Identity;
 use actix_web::{get, post, web, HttpResponse};
 use chrono::NaiveDate;
@@ -22,6 +22,9 @@ async fn get_new_training_set(
     pool: web::Data<PgPool>,
     user: Option<Identity>,
 ) -> HttpResponse {
+    if user.is_none() {
+        return response_util::to_login();
+    }
     let username = user.unwrap().id().unwrap();
 
     let rows_event = training_set_db::get_events(&pool, username.clone()).await;
@@ -52,6 +55,9 @@ async fn post_new_training_set(
     form: web::Form<TrainingSetForm>,
     user: Option<Identity>,
 ) -> HttpResponse {
+    if user.is_none() {
+        return response_util::to_login();
+    }
     let training_set_form = form.into_inner();
     let username = user.unwrap().id().unwrap();
 
@@ -61,7 +67,7 @@ async fn post_new_training_set(
             &training_set_form.event_name.unwrap(),
             username.clone(),
         )
-        .await
+            .await
     } else {
         training_set_form.event_id.unwrap()
     };
@@ -72,7 +78,7 @@ async fn post_new_training_set(
             &training_set_form.parts_name.unwrap(),
             username.clone(),
         )
-        .await
+            .await
     } else {
         training_set_form.parts_id.unwrap()
     };
@@ -88,7 +94,7 @@ async fn post_new_training_set(
             username: username.clone(),
         },
     )
-    .await;
+        .await;
 
     HttpResponse::Found()
         .append_header((

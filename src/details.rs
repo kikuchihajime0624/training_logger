@@ -1,5 +1,5 @@
 use crate::new::TrainingSetForm;
-use crate::training_set_db;
+use crate::{response_util, training_set_db};
 use actix_identity::Identity;
 use actix_web::{get, post, web, HttpResponse};
 use chrono::NaiveDate;
@@ -13,7 +13,15 @@ async fn training_set_detail(
     pool: web::Data<PgPool>,
     user: Option<Identity>,
 ) -> HttpResponse {
+    if user.is_none() {
+        return response_util::to_login();
+    }
+
     let workout_date = workout_date.into_inner();
+
+    if user.is_none() {
+        return response_util::to_login();
+    }
 
     let username = user.unwrap().id().unwrap();
 
@@ -36,7 +44,11 @@ async fn training_set_edit(
     pool: web::Data<PgPool>,
     user: Option<Identity>,
 ) -> HttpResponse {
+    if user.is_none() {
+        return response_util::to_login();
+    }
     let (workout_date, training_set_id) = path.into_inner();
+
     let username = user.unwrap().id().unwrap();
 
     let rows_event = training_set_db::get_events(&pool, username.clone()).await;
@@ -62,6 +74,9 @@ async fn update_training_set(
     path: web::Path<(NaiveDate, i32)>,
     user: Option<Identity>,
 ) -> HttpResponse {
+    if user.is_none() {
+        return response_util::to_login();
+    }
     let training_set_form = form.into_inner();
     let (workout_date, training_set_id) = path.into_inner();
     let username = user.unwrap().id().unwrap();
@@ -72,13 +87,17 @@ async fn update_training_set(
             &training_set_form.event_name.unwrap(),
             username.clone(),
         )
-        .await
+            .await
     } else {
         training_set_form.event_id.unwrap()
     };
 
     let new_parts_id = if training_set_form.parts_name.is_some() {
-        training_set_db::register_training_parts(&pool, &training_set_form.parts_name.unwrap(), username.clone())
+        training_set_db::register_training_parts(
+            &pool,
+            &training_set_form.parts_name.unwrap(),
+            username.clone(),
+        )
             .await
     } else {
         training_set_form.parts_id.unwrap()
@@ -93,10 +112,10 @@ async fn update_training_set(
             weight: training_set_form.weight,
             times: training_set_form.times,
             workout_date: training_set_form.workout_date,
-            username: username.clone()
+            username: username.clone(),
         },
     )
-    .await;
+        .await;
 
     HttpResponse::Found()
         .append_header(("Location", format!("/training_set/{}", workout_date)))
@@ -109,6 +128,9 @@ async fn delete_training_set(
     path: web::Path<(NaiveDate, i32)>,
     user: Option<Identity>,
 ) -> HttpResponse {
+    if user.is_none() {
+        return response_util::to_login();
+    }
     let (workout_date, training_set_id) = path.into_inner();
     let username = user.unwrap().id().unwrap();
 

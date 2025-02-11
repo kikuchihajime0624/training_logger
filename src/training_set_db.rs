@@ -22,12 +22,12 @@ pub async fn get_training_summary_list(
             ORDER BY workout_date DESC
             ",
     )
-    .bind(selected_year)
-    .bind(selected_month)
-    .bind(username)
-    .fetch_all(pool)
-    .await
-    .unwrap()
+        .bind(selected_year)
+        .bind(selected_month)
+        .bind(username)
+        .fetch_all(pool)
+        .await
+        .unwrap()
 }
 
 pub async fn get_oldest_year(pool: &PgPool, username: String) -> Option<NaiveDate> {
@@ -49,10 +49,10 @@ pub async fn get_events(pool: &PgPool, username: String) -> Vec<TrainingEvent> {
     sqlx::query_as::<_, TrainingEvent>(
         "SELECT * FROM training_event WHERE username = $1 ORDER BY event_id",
     )
-    .bind(username)
-    .fetch_all(pool)
-    .await
-    .unwrap()
+        .bind(username)
+        .fetch_all(pool)
+        .await
+        .unwrap()
 }
 #[derive(Debug, FromRow, Serialize)]
 pub struct TrainingPart {
@@ -65,10 +65,10 @@ pub async fn get_parts(pool: &PgPool, username: String) -> Vec<TrainingPart> {
     sqlx::query_as::<_, TrainingPart>(
         "SELECT * FROM training_parts WHERE username = $1 ORDER BY parts_id",
     )
-    .bind(username)
-    .fetch_all(pool)
-    .await
-    .unwrap()
+        .bind(username)
+        .fetch_all(pool)
+        .await
+        .unwrap()
 }
 
 pub async fn register_training_event(pool: &PgPool, event_name: &String, username: String) -> i32 {
@@ -80,11 +80,11 @@ pub async fn register_training_event(pool: &PgPool, event_name: &String, usernam
         RETURNING event_id
         ",
     )
-    .bind(event_name)
-    .bind(username)
-    .fetch_one(pool)
-    .await
-    .unwrap()
+        .bind(event_name)
+        .bind(username)
+        .fetch_one(pool)
+        .await
+        .unwrap()
 }
 
 pub async fn register_training_parts(pool: &PgPool, parts_name: &String, username: String) -> i32 {
@@ -96,11 +96,11 @@ pub async fn register_training_parts(pool: &PgPool, parts_name: &String, usernam
         RETURNING parts_id
         ",
     )
-    .bind(parts_name)
-    .bind(username)
-    .fetch_one(pool)
-    .await
-    .unwrap()
+        .bind(parts_name)
+        .bind(username)
+        .fetch_one(pool)
+        .await
+        .unwrap()
 }
 
 #[derive(Debug, Deserialize)]
@@ -118,15 +118,15 @@ pub async fn register_training_set(pool: &PgPool, new_training_set: NewTrainingS
         "INSERT INTO training_set(workout_date, event_id, parts_id,  weight, times, username)
         VALUES ($1, $2, $3, $4, $5, $6)",
     )
-    .bind(&new_training_set.workout_date)
-    .bind(&new_training_set.event_id)
-    .bind(&new_training_set.parts_id)
-    .bind(&new_training_set.weight)
-    .bind(&new_training_set.times)
-    .bind(&new_training_set.username)
-    .execute(pool)
-    .await
-    .unwrap();
+        .bind(&new_training_set.workout_date)
+        .bind(&new_training_set.event_id)
+        .bind(&new_training_set.parts_id)
+        .bind(&new_training_set.weight)
+        .bind(&new_training_set.times)
+        .bind(&new_training_set.username)
+        .execute(pool)
+        .await
+        .unwrap();
 }
 
 #[derive(Debug, FromRow, Serialize)]
@@ -197,16 +197,16 @@ pub async fn update_training_set(pool: &PgPool, update_training_set: TrainingSet
 
             WHERE training_set_id = $6 AND username = $7",
     )
-    .bind(&update_training_set.workout_date)
-    .bind(&update_training_set.event_id)
-    .bind(&update_training_set.parts_id)
-    .bind(&update_training_set.weight)
-    .bind(&update_training_set.times)
-    .bind(&update_training_set.training_set_id)
-    .bind(&update_training_set.username)
-    .execute(pool)
-    .await
-    .unwrap();
+        .bind(&update_training_set.workout_date)
+        .bind(&update_training_set.event_id)
+        .bind(&update_training_set.parts_id)
+        .bind(&update_training_set.weight)
+        .bind(&update_training_set.times)
+        .bind(&update_training_set.training_set_id)
+        .bind(&update_training_set.username)
+        .execute(pool)
+        .await
+        .unwrap();
 }
 
 pub async fn delete_training_set(pool: &PgPool, training_set_id: i32, username: String) {
@@ -214,9 +214,9 @@ pub async fn delete_training_set(pool: &PgPool, training_set_id: i32, username: 
         "DELETE FROM training_set
              WHERE training_set_id = $1 AND username = $2",
     )
-    .bind(training_set_id)
-    .bind(username)
-    .execute(pool)
-    .await
-    .unwrap();
+        .bind(training_set_id)
+        .bind(username)
+        .execute(pool)
+        .await
+        .unwrap();
 }

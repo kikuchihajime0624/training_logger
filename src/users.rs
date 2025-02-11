@@ -1,5 +1,5 @@
-use actix_identity::Identity;
 use crate::users_db;
+use actix_identity::Identity;
 use actix_web::{get, post, web, HttpMessage, HttpRequest, HttpResponse};
 use bcrypt::{hash, verify, DEFAULT_COST};
 use serde::Deserialize;
@@ -14,7 +14,7 @@ struct LoginForm {
 
 #[get("/login")]
 async fn get_login(tera: web::Data<Tera>) -> HttpResponse {
-    let  context = Context::new();
+    let context = Context::new();
 
     let rendered = tera.render("login.tera", &context).unwrap();
     HttpResponse::Ok().content_type("text/html").body(rendered)
@@ -51,14 +51,12 @@ async fn post_login(
 }
 
 #[post("/logout")]
-async fn logout( user: Option<Identity>) -> HttpResponse {
-
+async fn logout(user: Option<Identity>) -> HttpResponse {
     user.unwrap().logout();
 
     HttpResponse::Found()
         .append_header(("Location", "/login"))
         .finish()
-
 }
 
 #[derive(Debug, Deserialize)]
@@ -111,7 +109,7 @@ async fn post_signup(
             password,
         },
     )
-    .await;
+        .await;
 
     HttpResponse::Found()
         .append_header(("Location", "/login"))

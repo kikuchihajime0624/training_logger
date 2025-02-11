@@ -3,6 +3,7 @@ mod new;
 mod training_set_db;
 mod users;
 mod users_db;
+mod response_util;
 
 use actix_files::Files;
 use actix_identity::{Identity, IdentityMiddleware};
@@ -44,6 +45,9 @@ async fn get_workout_date(
     query: web::Query<SelectYearMonth>,
     user: Option<Identity>,
 ) -> HttpResponse {
+    if user.is_none() {
+        return response_util::to_login();
+    }
     let current_year = Local::now().year();
     let username = user.unwrap().id().unwrap();
 
@@ -56,7 +60,7 @@ async fn get_workout_date(
         selected_month,
         username.clone(),
     )
-    .await;
+        .await;
 
     let oldest_year = training_set_db::get_oldest_year(&pool, username.clone())
         .await
@@ -117,7 +121,7 @@ async fn main() -> std::io::Result<()> {
             .app_data(web::Data::new(templates))
             .app_data(web::Data::new(pool.clone()))
     })
-    .bind(("0.0.0.0", port))?
-    .run()
-    .await
+        .bind(("0.0.0.0", port))?
+        .run()
+        .await
 }

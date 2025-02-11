@@ -21,9 +21,9 @@ pub async fn register_user(pool: &PgPool, user: User) {
         VALUES ($1, $2)
         ",
     )
-    .bind(user.username)
-    .bind(user.password)
-    .execute(pool)
-    .await
-    .unwrap();
+        .bind(user.username)
+        .bind(user.password)
+        .execute(pool)
+        .await
+        .unwrap();
 }
