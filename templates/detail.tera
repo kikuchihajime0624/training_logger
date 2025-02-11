@@ -8,7 +8,7 @@
 
 
     <h1>{{ workout_date | date(format="%Y/%m/%d") }}</h1>
-   総重量    {{ sum_daily | separate_with_commas }} kg
+    総重量    {{ sum_daily | separate_with_commas }} kg
 
     <table class="table my-3">
         <thead>
@@ -18,7 +18,7 @@
             <th>重量</th>
             <th>回数</th>
             <th></th>
-            <th></th>
+
         </tr>
         </thead>
         <tbody>
@@ -33,14 +33,10 @@
 
                 <td>
                     <a href="/training_set/{{ workout_date }}/edit/{{ training_set_detail.training_set_id }}"
-                       class="btn btn-light border ">編集する</a>
+                       class="btn btn-light border ">編集</a>
                 </td>
-                <td>
-                    <form action="/training_set/{{ workout_date }}/delete/{{ training_set_detail.training_set_id }}"
-                          method="post">
-                        <button class="btn btn-light ">削除する</button>
-                    </form>
-                </td>
+
+
             </tr>
         {% endfor %}
         </tbody>
