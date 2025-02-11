@@ -16,12 +16,12 @@
 
         <div>
             <label for="username">ユーザー名</label>
-            <input type="text" id="username" name="username" placeholder="ユーザー名" required/>
+            <input type="text" id="username" name="username" placeholder="ユーザー名" maxlength="32" required/>
         </div>
 
         <div>
             <label for="password">パスワード</label>
-            <input type="password" id="password" name="password" placeholder="パスワード" required/>
+            <input type="password" id="password" name="password" maxlength="32" placeholder="パスワード" required/>
         </div>
 
         <div>

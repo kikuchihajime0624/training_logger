@@ -18,7 +18,7 @@
             <div>
                 <label for="workout_date">日付</label>
                 <input type="date" id="workout_date" name="workout_date"
-                       value="{{ workout_date }}" required />
+                       value="{{ workout_date }}" required/>
 
             </div>
             <div>
@@ -33,7 +33,8 @@
                         >{{ event.event_name }}</option>
                     {% endfor %}
                 </select>
-                <label for="event_name"></label><input type="text" id="event_name" name="event_name" disabled required/>
+                <label for="event_name"></label><input type="text" id="event_name" name="event_name" maxlength="20"
+                                                       disabled required/>
             </div>
             <small>プルダウンから選択するか新しい種目名を入力してください。</small>
 
@@ -49,17 +50,20 @@
                         >{{ parts.parts_name }}</option>
                     {% endfor %}
                 </select>
-                <label for="parts_name"></label><input type="text" id="parts_name" name="parts_name" disabled required/>
+                <label for="parts_name"></label><input type="text" id="parts_name" name="parts_name" maxlength="20"
+                                                       disabled required/>
             </div>
             <small>プルダウンから選択するか新しい部位名を入力してください。</small>
             <div>
                 <label for="weight">重量</label>
-                <input type="number" id="weight" name="weight" value="{{ training_set_detail.weight }}" required/>
+                <input type="number" id="weight" name="weight" value="{{ training_set_detail.weight }}" step="0.1"
+                       min="0.1" max="999.9" required/>
 
             </div>
             <div>
                 <label for="times">回数</label>
-                <input type="number" id="times" name="times" value="{{ training_set_detail.times }}" required/>
+                <input type="number" id="times" name="times" value="{{ training_set_detail.times }}" min="1" max="999"
+                       required/>
             </div>
         </div>
 
