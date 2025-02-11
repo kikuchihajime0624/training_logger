@@ -8,6 +8,7 @@
 
 
     <h1>Detail</h1>
+{{ workout_date }}の総重量    {{ sum_daily }} kg
 
 
     {% for training_set_detail in training_set_detail_list %}

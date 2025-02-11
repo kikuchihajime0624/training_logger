@@ -28,9 +28,16 @@ async fn training_set_detail(
     let rows =
         training_set_db::get_training_set_by_workout_date(&pool, &workout_date, username).await;
 
+    let mut sum_daily: f32 = 0.0;
+    for training_set_detail in &rows {
+        sum_daily +=  training_set_detail.weight * training_set_detail.times as f32;
+
+    }
+
     let mut context = Context::new();
     context.insert("training_set_detail_list", &rows);
     context.insert("workout_date", &workout_date);
+    context.insert("sum_daily", &sum_daily);
 
     let rendered = tera.render("detail.tera", &context).unwrap();
     HttpResponse::Ok().content_type("text/html").body(rendered)
@@ -87,7 +94,7 @@ async fn update_training_set(
             &training_set_form.event_name.unwrap(),
             username.clone(),
         )
-            .await
+        .await
     } else {
         training_set_form.event_id.unwrap()
     };
@@ -98,7 +105,7 @@ async fn update_training_set(
             &training_set_form.parts_name.unwrap(),
             username.clone(),
         )
-            .await
+        .await
     } else {
         training_set_form.parts_id.unwrap()
     };
@@ -115,7 +122,7 @@ async fn update_training_set(
             username: username.clone(),
         },
     )
-        .await;
+    .await;
 
     HttpResponse::Found()
         .append_header(("Location", format!("/training_set/{}", workout_date)))
