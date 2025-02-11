@@ -1,0 +1,9 @@
+{% extends "base.tera" %}
+
+{% block title %}Not Found{% endblock %}
+
+{% block content %}
+
+    <h1>Not Found</h1>
+
+{% endblock %}
