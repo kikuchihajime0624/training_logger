@@ -11,52 +11,68 @@
     <h1>記録をつける</h1>
 
     <form action="/new" method="post">
-        <div>
-            <label for="workout_date">日付</label>
-            <input type="date" id="workout_date" name="workout_date" required/>
+        <div class="mt-3 row">
+            <div class="col-12 col-md-6">
+                <label for="workout_date" class="form-label">日付</label>
+                <input type="date" id="workout_date" name="workout_date" class="form-control" required/>
+            </div>
+        </div>
+        <div class="mt-3 row">
+            <div class="col-12 col-md-6">
+                <label for="event_id" class="form-label">種目</label>
+                <select id="event_id" name="event_id" class="form-select">
+                    <option value="">(新しい種目を入力)</option>
+                    {% for event in event_list %}
+                        <option value="{{ event.event_id }}">{{ event.event_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-12 col-md-6">
+                <label for="event_name" class="form-label">種目名</label>
+                <input type="text" id="event_name" name="event_name" class="form-control"
+                       placeholder="新しい種目はここに入力" maxlength="20" required/>
+            </div>
+            <small class="form-text">プルダウンから選択するか新しい種目名を入力してください。</small>
 
         </div>
-        <div>
-            <label for="event_id">種目</label>
-            <select id="event_id" name="event_id">
-                <option value="">(新しい種目を入力)</option>
-                {% for event in event_list %}
-                    <option value="{{ event.event_id }}">{{ event.event_name }}</option>
-                {% endfor %}
-            </select>
-            <label for="event_name">種目名</label>
-            <input type="text" id="event_name" name="event_name" placeholder="新しい種目はここに入力" maxlength="20" required/>
 
-        </div>
-        <small>プルダウンから選択するか新しい種目名を入力してください。</small>
-
-        <div>
-            <label for="parts_id">部位</label>
-            <select id="parts_id" name="parts_id">
-                <option value="">(新しい部位を入力)</option>
-                {% for parts in parts_list %}
-                    <option value="{{ parts.parts_id }}">{{ parts.parts_name }}</option>
-                {% endfor %}
-            </select>
-            <label for="parts_name">部位名</label>
-            <input type="text" id="parts_name" name="parts_name" placeholder="新しい部位はここに入力" maxlength="20" required/>
-        </div>
-        <small>プルダウンから選択するか新しい部位名を入力してください。</small>
-
-        <div>
-            <label for="weight">重量</label>
-            <input type="number" min="0.1" max="999.9" step="0.1" id="weight" name="weight" placeholder="重量を入力"
-                   required/>
-
-        </div>
-        <div>
-            <label for="times">回数</label>
-            <input type="number" id="times" name="times" min="1" max="999" placeholder="回数を入力" required/>
+        <div class="mt-3 row">
+            <div class="col-12 col-md-6">
+                <label for="parts_id" class="form-label">部位</label>
+                <select id="parts_id" name="parts_id" class="form-select">
+                    <option value="">(新しい部位を入力)</option>
+                    {% for parts in parts_list %}
+                        <option value="{{ parts.parts_id }}">{{ parts.parts_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-12 col-md-6">
+                <label for="parts_name" class="form-label">部位名</label>
+                <input type="text" id="parts_name" name="parts_name" class="form-control"
+                       placeholder="新しい部位はここに入力" maxlength="20" required/>
+            </div>
+            <small class="form-text">プルダウンから選択するか新しい部位名を入力してください。</small>
         </div>
 
 
-        <div>
-            <button type="submit">追加</button>
+        <div class="mt-3 row">
+            <div class="col-12 col-md-6">
+                <label for="weight" class="form-label">重量</label>
+                <input type="number" min="0.1" max="999.9" step="0.1" id="weight" name="weight" class="form-control"
+                       placeholder="10kg"
+                       required/>
+            </div>
+            <div class="col-12 col-md-6">
+                <label for="times" class="form-label">回数</label>
+                <input type="number" id="times" name="times" min="1" max="999" class="form-control"
+                       placeholder="10"
+                       required/>
+            </div>
+        </div>
+
+
+        <div class="mt-3">
+            <button type="submit" class="btn btn-primary">追加</button>
         </div>
     </form>
 {% endblock %}

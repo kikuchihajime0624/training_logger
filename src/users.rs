@@ -52,7 +52,9 @@ async fn post_login(
 
 #[post("/logout")]
 async fn logout(user: Option<Identity>) -> HttpResponse {
-    user.unwrap().logout();
+    if let Some(identity) = user {
+        identity.logout()
+    }
 
     HttpResponse::Found()
         .append_header(("Location", "/login"))
@@ -109,10 +111,9 @@ async fn post_signup(
             password,
         },
     )
-        .await;
+    .await;
 
     HttpResponse::Found()
         .append_header(("Location", "/login"))
         .finish()
 }
-

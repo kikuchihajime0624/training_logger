@@ -7,7 +7,7 @@
 {% block content %}
 
     <div>
-        <a href="/new">
+        <a href="/new" >
             {% block subtitle %}
                 記録をつける
             {% endblock %}
