@@ -1,3 +1,8 @@
-body {
-    padding-top: 1em;
+nav {
+    background-color: indigo;
+
+}
+
+.max_width {
+    max-width: 500px;
 }
