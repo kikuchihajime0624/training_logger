@@ -4,13 +4,15 @@
 
 {% block script %}
     <script src="/static/js/training_set_form.js" defer></script>
+    <script src="/static/js/delete_confirm.js" defer></script>
 {% endblock %}
 
 {% block content %}
 
     <h1>記録をつける</h1>
 
-    <form action="/training_set/{{ workout_date }}/edit/{{ training_set_detail.training_set_id }}" method="post">
+    <form action="/training_set/{{ workout_date }}/edit/{{ training_set_detail.training_set_id }}" method="post"
+          id="form">
 
         <div class="mt-3 row">
             <div class="col-12 col-md-6">
@@ -87,7 +89,7 @@
 
             <button class="btn btn-light mx-2"
                     formaction="/training_set/{{ workout_date }}/delete/{{ training_set_detail.training_set_id }}"
-                    formnovalidate>
+                    formnovalidate id="delete_button">
                 削除
             </button>
         </div>

@@ -33,4 +33,19 @@
 
     </form>
 
+    <div class="mt-3">
+
+        <p>
+            日々のトレーニングを記録し、管理するWebアプリです。
+            日付ごとに行った種目、どこを鍛えたか、重量、回数が記録できます。
+        </p>
+
+        <div>
+            <img class="img-thumbnail" src="/static/images/workout_example_1.png"
+                 alt="screenshot of logging new workouts"/>
+        </div>
+
+
+    </div>
+
 {% endblock %}
