@@ -10,3 +10,14 @@ nav {
     max-width: 400px;
 }
 
+.workout_date {
+    text-decoration: none;
+    display: block;
+    transition: box-shadow 0.1s;
+
+}
+
+.workout_date:hover {
+    box-shadow: 2px 2px 2px 5px #afeeee;
+    transition: box-shadow 0.1s;
+}
