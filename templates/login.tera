@@ -1,7 +1,7 @@
 {% extends "base.tera" %}
 
 
-    {% block title %} login {% endblock %}
+    {% block title %} ログイン {% endblock %}
 
 {% block content %}
 

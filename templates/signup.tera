@@ -1,7 +1,7 @@
 {% extends "base.tera" %}
 
 
-    {% block title %} register {% endblock %}
+    {% block title %}ユーザー登録{% endblock %}
 
 {% block content %}
     <form action="/signup" method="post" class="max_width mx-auto">

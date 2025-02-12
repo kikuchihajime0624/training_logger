@@ -1,7 +1,7 @@
 {% extends "base.tera" %}
 
 
-    {% block title %} home {% endblock %}
+    {% block title %} トップページ {% endblock %}
 
 
 {% block content %}

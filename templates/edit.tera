@@ -9,7 +9,7 @@
 
 {% block content %}
 
-    <h1>記録をつける</h1>
+    <h1>編集</h1>
 
     <form action="/training_set/{{ workout_date }}/edit/{{ training_set_detail.training_set_id }}" method="post"
           id="form">

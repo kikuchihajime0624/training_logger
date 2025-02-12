@@ -1,9 +1,10 @@
 {% extends "base.tera" %}
 
-{% block title %}Not Found{% endblock %}
+{% block title %}ページが見つかりません{% endblock %}
 
 {% block content %}
 
-    <h1>Not Found</h1>
+    <h1>ページが見つかりません</h1>
+    <a href="/">トップページへ戻る</a>
 
 {% endblock %}
