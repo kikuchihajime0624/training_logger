@@ -15,23 +15,23 @@
         <div>
             <label for="username" class="form-label">ユーザー名</label>
             <input type="text" value="{{ username }}" id="username" class="form-control" name="username"
-                   pattern="[\w_\-]+" maxlength="32"
+                   pattern="[\w_\-]+" maxlength="32" minlength="8"
                    required>
-            <small class="form-text">半角英数、アンダースコア(_)、ハイフン(-)で32字以内</small>
+            <small class="form-text">半角英数、アンダースコア(_)、ハイフン(-)で8文字以上32字以内</small>
         </div>
 
 
         <div class="mt-3">
             <label for="password" class="form-label">パスワード</label>
-            <input type="password" id="password" class="form-control" name="password" maxlength="32" required>
-            <small class="form-text">32字以内</small>
+            <input type="password" id="password" class="form-control" name="password" maxlength="32" minlength="8" required>
+            <small class="form-text">8文字以上32字以内</small>
         </div>
 
         <div class="mt-3">
             <label for="confirm_password" class="form-label">パスワードの確認</label>
             <input type="password" id="confirm_password" class="form-control" name="confirm_password" maxlength="32"
-                   required>
-            <small class="form-text">32字以内</small>
+                   minlength="8" required>
+            <small class="form-text">8文字以上32字以内</small>
 
         </div>
         <div class="mt-3">
