@@ -86,7 +86,8 @@
             <button type="submit" class="btn btn-primary">変更</button>
 
             <button class="btn btn-light mx-2"
-                    formaction="/training_set/{{ workout_date }}/delete/{{ training_set_detail.training_set_id }}">
+                    formaction="/training_set/{{ workout_date }}/delete/{{ training_set_detail.training_set_id }}"
+                    formnovalidate>
                 削除
             </button>
         </div>
