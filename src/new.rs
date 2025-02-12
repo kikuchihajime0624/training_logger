@@ -1,7 +1,7 @@
-use crate::{response_util, training_set_db, SelectYearMonth};
+use crate::{response_util, training_set_db};
 use actix_identity::Identity;
 use actix_web::{get, post, web, HttpResponse};
-use chrono::{Datelike, Local, NaiveDate};
+use chrono::{Local, NaiveDate};
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, PgPool};
 use tera::{Context, Tera};
@@ -19,7 +19,7 @@ struct TrainingSet {
 #[derive(Debug, Deserialize)]
 struct WorkoutDateQuery {
     workout_date: Option<NaiveDate>,
-    }
+}
 #[get("/new")]
 async fn get_new_training_set(
     tera: web::Data<Tera>,
@@ -75,7 +75,7 @@ async fn post_new_training_set(
             &training_set_form.event_name.unwrap(),
             username.clone(),
         )
-            .await
+        .await
     } else {
         training_set_form.event_id.unwrap()
     };
@@ -86,7 +86,7 @@ async fn post_new_training_set(
             &training_set_form.parts_name.unwrap(),
             username.clone(),
         )
-            .await
+        .await
     } else {
         training_set_form.parts_id.unwrap()
     };
@@ -102,7 +102,7 @@ async fn post_new_training_set(
             username: username.clone(),
         },
     )
-        .await;
+    .await;
 
     HttpResponse::Found()
         .append_header((
