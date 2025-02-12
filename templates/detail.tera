@@ -6,9 +6,17 @@
 
 {% block content %}
 
-
-    <h1>{{ workout_date | date(format="%Y/%m/%d") }}</h1>
+    <div class="d-flex justify-content-between">
+        <h1>{{ workout_date | date(format="%Y/%m/%d") }}</h1>
+        <div>
+            <a href="/new?workout_date={{ workout_date }}" class="btn btn-primary border border-black border-2 rounded-pill ">
+                記録をつける
+            </a>
+        </div>
+    </div>
     総重量    {{ sum_daily | separate_with_commas }} kg
+
+
 
     <table class="table my-3">
         <thead>

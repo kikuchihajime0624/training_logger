@@ -1,7 +1,7 @@
-use crate::{response_util, training_set_db};
+use crate::{response_util, training_set_db, SelectYearMonth};
 use actix_identity::Identity;
 use actix_web::{get, post, web, HttpResponse};
-use chrono::NaiveDate;
+use chrono::{Datelike, Local, NaiveDate};
 use serde::{Deserialize, Serialize};
 use sqlx::{FromRow, PgPool};
 use tera::{Context, Tera};
@@ -16,16 +16,23 @@ struct TrainingSet {
     workout_date: NaiveDate,
 }
 
+#[derive(Debug, Deserialize)]
+struct WorkoutDateQuery {
+    workout_date: Option<NaiveDate>,
+    }
 #[get("/new")]
 async fn get_new_training_set(
     tera: web::Data<Tera>,
     pool: web::Data<PgPool>,
     user: Option<Identity>,
+    query: web::Query<WorkoutDateQuery>,
 ) -> HttpResponse {
     if user.is_none() {
         return response_util::to_login();
     }
     let username = user.unwrap().id().unwrap();
+
+    let workout_date = query.workout_date.unwrap_or(Local::now().date_naive());
 
     let rows_event = training_set_db::get_events(&pool, username.clone()).await;
     let rows_parts = training_set_db::get_parts(&pool, username.clone()).await;
@@ -33,6 +40,7 @@ async fn get_new_training_set(
     let mut context = Context::new();
     context.insert("event_list", &rows_event);
     context.insert("parts_list", &rows_parts);
+    context.insert("workout_date", &workout_date);
 
     let rendered = tera.render("new.tera", &context).unwrap();
     HttpResponse::Ok().content_type("text/html").body(rendered)

@@ -10,8 +10,6 @@
         <a href="/new" class="btn btn-primary border border-black border-2 rounded-pill ">
             記録をつける
         </a>
-
-
     </div>
     <div>
         <form action="/training_set" method="get">
