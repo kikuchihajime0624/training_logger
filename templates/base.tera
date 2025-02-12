@@ -6,6 +6,7 @@
     <meta property="og:title" content="Workout Logger">
     <meta property="og:type" content="webstie">
     <meta property="og:url" content="https://workout-logger-c168.onrender.com">
+    <meta property="og:image" content="https://workout-logger-c168.onrender.com/static/images/workout_example_1.png">
     <meta property="og:site_name" content="Workout Logger">
     <meta property="og:description"
           content="日々のトレーニングを記録するためのアプリです。日付ごとにやった種目、どこを鍛えたか、重量、回数が記録できます。">
